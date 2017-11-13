@@ -1,0 +1,6 @@
+﻿  main.cpp
+main.cpp(67): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _getch. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\conio.h(452): note: see declaration of 'getch'
+C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(1189,5): warning MSB8012: TargetPath(E:\Google Drive\School\Courses\Term 8\CSCI 3280\Project\playAudio\irrKlang-64bit-1.5.0\irrKlang-64bit-1.5.0\examples\01.HelloWorld\x64\Debug\01.HelloWorld.exe) does not match the Linker's OutputFile property value (E:\Google Drive\School\Courses\Term 8\CSCI 3280\Project\playAudio\irrKlang-64bit-1.5.0\irrKlang-64bit-1.5.0\bin\Winx64-visualStudio\01.HelloWorld.exe). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+  01.HelloWorld.vcxproj -> E:\Google Drive\School\Courses\Term 8\CSCI 3280\Project\playAudio\irrKlang-64bit-1.5.0\irrKlang-64bit-1.5.0\examples\01.HelloWorld\x64\Debug\01.HelloWorld.exe
+  01.HelloWorld.vcxproj -> E:\Google Drive\School\Courses\Term 8\CSCI 3280\Project\playAudio\irrKlang-64bit-1.5.0\irrKlang-64bit-1.5.0\examples\01.HelloWorld\x64\Debug\01.HelloWorld.pdb (Full PDB)

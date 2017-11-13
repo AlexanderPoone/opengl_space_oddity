@@ -1,0 +1,40 @@
+﻿  algebra3.cpp
+  arcball.cpp
+  glui.cpp
+  glui_add_controls.cpp
+  glui_bitmaps.cpp
+  glui_bitmap_img_data.cpp
+  glui_button.cpp
+  glui_checkbox.cpp
+  glui_column.cpp
+  glui_commandline.cpp
+  glui_control.cpp
+  glui_edittext.cpp
+  glui_filebrowser.cpp
+  glui_list.cpp
+  glui_listbox.cpp
+  glui_mouse_iaction.cpp
+  glui_node.cpp
+  glui_panel.cpp
+  glui_radio.cpp
+  glui_rollout.cpp
+  Generando código...
+  Compilando...
+  glui_rotation.cpp
+  glui_scrollbar.cpp
+  glui_separator.cpp
+  glui_spinner.cpp
+  glui_statictext.cpp
+  glui_string.cpp
+  glui_textbox.cpp
+..\glui_textbox.cpp(1073): warning C4477: 'fprintf' : la cadena de formato '%d' requiere un argumento de tipo 'int', pero el argumento variádico 9 tiene el tipo 'unsigned __int64'
+  ..\glui_textbox.cpp(1073): note: considere el uso de ' %zd' en la cadena de formato
+  glui_translation.cpp
+  glui_tree.cpp
+  glui_treepanel.cpp
+  glui_window.cpp
+  quaternion.cpp
+  Generando código...
+C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(1357,5): warning MSB8012: TargetPath(C:\Users\Alexandre Poon\Desktop\OpenGL Sandbox\project\project\project\Dependencies\glui\src\msvc\x64\Debug\_glui library.lib) does not match the Library's OutputFile property value (C:\Users\Alexandre Poon\Desktop\OpenGL Sandbox\project\project\project\Dependencies\glui\src\msvc\lib\glui32d.lib). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(1359,5): warning MSB8012: TargetName(_glui library) does not match the Library's OutputFile property value (glui32d). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+  glui.vcxproj -> C:\Users\Alexandre Poon\Desktop\OpenGL Sandbox\project\project\project\Dependencies\glui\src\msvc\x64\Debug\_glui library.lib
