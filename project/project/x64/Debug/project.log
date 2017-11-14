@@ -1,7 +1,7 @@
 ﻿  main.cpp
-c:\program files (x86)\microsoft visual studio 14.0\vc\include\gl\glui.h(880): warning C4244: 'argumento': conversión de 'double' a 'GLfloat'; posible pérdida de datos
-c:\users\alexandre poon\desktop\opengl sandbox\project\project\project\main.cpp(378): warning C4101: 'height': variable local sin referencia
-c:\users\alexandre poon\desktop\opengl sandbox\project\project\project\main.cpp(378): warning C4101: 'width': variable local sin referencia
-c:\users\alexandre poon\desktop\opengl sandbox\project\project\project\main.cpp(521): warning C4267: 'argumento': conversión de 'size_t' a 'DWORD'; posible pérdida de datos
-  project.vcxproj -> C:\Users\Alexandre Poon\Desktop\OpenGL Sandbox\project\project\x64\Debug\project.exe
-  project.vcxproj -> C:\Users\Alexandre Poon\Desktop\OpenGL Sandbox\project\project\x64\Debug\project.pdb (Partial PDB)
+c:\users\alex poon\desktop\inav\project\includes\gl\glui.h(880): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+c:\users\alex poon\desktop\inav\project\project\main.cpp(417): warning C4101: 'height': unreferenced local variable
+c:\users\alex poon\desktop\inav\project\project\main.cpp(417): warning C4101: 'width': unreferenced local variable
+c:\users\alex poon\desktop\inav\project\project\main.cpp(560): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+  project.vcxproj -> C:\Users\Alex Poon\Desktop\inav\project\x64\Debug\project.exe
+  project.vcxproj -> C:\Users\Alex Poon\Desktop\inav\project\x64\Debug\project.pdb (Partial PDB)

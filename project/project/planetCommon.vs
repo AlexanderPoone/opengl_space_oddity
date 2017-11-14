@@ -1,32 +1,23 @@
 #version 430
-// VertexShader.glsl Ambient+Diffuse
 
-in layout(location=0) vec3 position;
-in layout(location=1) vec2 uv;
-in layout(location=2) vec3 normal;
+layout(location=0) in vec3 position;	//aPos
+layout(location=1) in vec2 uv;			//aTexCoords
+layout(location=2) in vec3 normal;		//aNormal
 
-uniform vec3 ambientLight;
+out vec3 FragPos;						//positionWorld
+out vec2 TexCoords;						//uvWorld
+out vec3 Normal;						//normalWorld
 
 uniform mat4 model;
 uniform mat4 projection;
 uniform mat4 view;
 
-out vec3 positionWorld;
-out vec2 uvWorld;
-out vec3 normalWorld;
-//out vec4 ShadowCoord;
 
-void main() {
-	vec4 v=vec4(position, 1.0);
-	vec4 newPosition = model * v;
-	vec4 projectedPosition=view * projection * newPosition;
-	gl_Position=projectedPosition;
-
-	//ShadowCoord = DepthBiasMVP * projectedPosition;
-
-	vec4 normal_temp=modelTransformMatrix*vec4(normal,0);
-	normalWorld=normal_temp.xyz;
-
-	positionWorld=newPosition.xyz;
-	uvWorld=uv;
+void main()
+{
+    FragPos = vec3(model * vec4(position, 1.0));
+    Normal = mat3(transpose(inverse(model))) * normal;  
+    TexCoords = uv;
+    
+    gl_Position = projection * view * vec4(FragPos, 1.0);
 }

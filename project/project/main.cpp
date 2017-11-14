@@ -3,12 +3,12 @@
 #include <string.h>
 #include <fstream>
 #include <vector>
-#include <GL/glew.h>
-#include <GL/glut.h>
-#include <GL/glui.h>
-#include <GL/glm.hpp>
-#include <GL/gtc/matrix_transform.hpp>
-#include <GL/SOIL.h>
+#include "GL/glew.h"
+#include "GL/glut.h"
+#include "GL/glui.h"
+#include "GL/glm.hpp"
+#include "GL/gtc/matrix_transform.hpp"
+#include "GL/SOIL.h"
 
 #include "irrKlang.h"
 using namespace std;
@@ -124,12 +124,18 @@ float lampVertices[] = {
 };
 
 glm::vec3 lightPos(-0.05f, -0.05f, -0.5f);
+glm::vec3 cameraPos(0.0f, 0.0f, 0.0f);
 
 GLuint lampVAO, lampVBO, lampShader;
 
 GLuint skyboxVAO, skyboxVBO, skyboxShader, skyboxTexture;
 
-GLuint planetCommonVAO, planetCommonVBO, planetCommonUV, planetCommonNormal, planet0Texture, planet1Texture, planet2Texture, planetCommonShader;
+GLuint planetCommonVAO, planetCommonVBO, planetCommonUV, planetCommonNormal, planetCommonShader;
+GLuint planet0_diffuseMap, planet0_specularMap, planet0_emissionMap;
+GLuint planet1_diffuseMap, planet1_specularMap, planet1_emissionMap;
+GLuint planet2_diffuseMap, planet2_specularMap, planet2_emissionMap;
+
+GLfloat planet0_rotationAngle = 0.0f;
 
 int fogColorId;
 float hor = 0.0f, ver = 0.0f;
@@ -179,50 +185,83 @@ void myGlutDisplay(void)
 
 
 
-	//// draw skybox as last
-	//glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+	// draw skybox as last
+	glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 
-	//glUseProgram(skyboxShader);
-	//GLint viewUniformLocation = glGetUniformLocation(skyboxShader, "view");
-	//glUniformMatrix4fv(viewUniformLocation, 1, GL_FALSE, &view[0][0]);
-	//GLint projectionUniformLocation = glGetUniformLocation(skyboxShader, "projection");
-	//glUniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, &projection[0][0]);
-	//// skybox cube
-	//glBindVertexArray(skyboxVAO);
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
-	//glDrawArrays(GL_TRIANGLES, 0, 36);
-	//glBindVertexArray(0);
-	//glDepthFunc(GL_LESS); // set depth function back to default
-
-	//model = glm::translate(model, lightPos);
-	//model = glm::scale(model, glm::vec3(0.1f)); // a smaller cube
-	//glUseProgram(lampShader);
-	//GLint modelUniformLocation = glGetUniformLocation(lampShader, "model");
-	//glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, &model[0][0]);
-	//viewUniformLocation = glGetUniformLocation(lampShader, "view");
-	//glUniformMatrix4fv(viewUniformLocation, 1, GL_FALSE, &view[0][0]);
-	//projectionUniformLocation = glGetUniformLocation(lampShader, "projection");
-	//glUniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, &projection[0][0]);
-	//// lamp cube
-	//glBindVertexArray(lampVAO);
-	//glDrawArrays(GL_TRIANGLES, 0, 36);
-	//glBindVertexArray(0);
-
-	model = glm::scale(model, glm::vec3(0.05f)); // planet 0
-	glUseProgram(planetCommonShader);
-	GLuint modelUniformLocation = glGetUniformLocation(planetCommonShader, "model");
-	glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, &model[0][0]);
-	GLuint viewUniformLocation = glGetUniformLocation(planetCommonShader, "view");
+	glUseProgram(skyboxShader);
+	GLint viewUniformLocation = glGetUniformLocation(skyboxShader, "view");
 	glUniformMatrix4fv(viewUniformLocation, 1, GL_FALSE, &view[0][0]);
-	GLuint projectionUniformLocation = glGetUniformLocation(planetCommonShader, "projection");
+	GLint projectionUniformLocation = glGetUniformLocation(skyboxShader, "projection");
+	glUniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, &projection[0][0]);
+	// skybox cube
+	glBindVertexArray(skyboxVAO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+	glDepthFunc(GL_LESS); // set depth function back to default
+
+	model = glm::translate(model, lightPos);
+	model = glm::scale(model, glm::vec3(0.1f)); // a smaller cube
+	glUseProgram(lampShader);
+	GLint modelUniformLocation = glGetUniformLocation(lampShader, "model");
+	glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, &model[0][0]);
+	viewUniformLocation = glGetUniformLocation(lampShader, "view");
+	glUniformMatrix4fv(viewUniformLocation, 1, GL_FALSE, &view[0][0]);
+	projectionUniformLocation = glGetUniformLocation(lampShader, "projection");
 	glUniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, &projection[0][0]);
 	// lamp cube
-	glBindVertexArray(planetCommonVAO);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, planet0Texture);
-	glDrawArrays(GL_QUADS, 0, 2522);
+	glBindVertexArray(lampVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
+
+	/****************************************/
+	/*         Planet 0 starts here         */
+	/****************************************/
+	model = glm::mat4(1.0f);
+	model = glm::rotate(model, glm::radians(planet0_rotationAngle), glm::vec3(0,1,0));
+	planet0_rotationAngle += 0.01f;
+	model = glm::translate(model, glm::vec3(0.3f,0.0f,-0.7f));
+	model = glm::scale(model, glm::vec3(0.1f));
+	glUseProgram(planetCommonShader);
+
+	glUniform3fv(glGetUniformLocation(planetCommonShader, "light.position"), 1, &lightPos[0]);
+	glUniform3fv(glGetUniformLocation(planetCommonShader, "viewPos"), 1, &cameraPos[0]);
+	std::cout << glGetError() << std::endl; // returns 0 (no error)
+
+	glm::vec3 lightAmbient(0.2f, 0.2f, 0.2f);
+	glm::vec3 lightDiffuse(0.5f, 0.5f, 0.5f);
+	glm::vec3 lightSpecular(1.0f, 1.0f, 1.0f);
+	glUniform3fv(glGetUniformLocation(planetCommonShader, "light.ambient"), 1, &lightAmbient[0]);
+	glUniform3fv(glGetUniformLocation(planetCommonShader, "light.diffuse"), 1, &lightDiffuse[0]);
+	glUniform3fv(glGetUniformLocation(planetCommonShader, "light.specular"), 1, &lightSpecular[0]);
+
+	glUniformMatrix4fv(glGetUniformLocation(planetCommonShader, "model"), 1, GL_FALSE, &model[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(planetCommonShader, "view"), 1, GL_FALSE, &view[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(planetCommonShader, "projection"), 1, GL_FALSE, &projection[0][0]);
+
+	glUniform1i(glGetUniformLocation(planetCommonShader, "material.emission"), 0);				//sampler
+	glUniform1i(glGetUniformLocation(planetCommonShader, "material.diffuse"), 1);				//sampler
+	glUniform1i(glGetUniformLocation(planetCommonShader, "material.specular"), 2);				//sampler
+	GLfloat materialShininess = 64.0f;															//but not this one
+	glUniform1f(glGetUniformLocation(planetCommonShader, "material.shininess"), materialShininess);
+
+	// bind diffuse map
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, planet0_diffuseMap);
+	// bind specular map
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, planet0_specularMap);
+	// bind emission map
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, planet0_emissionMap);
+	// render the sphere
+	glBindVertexArray(planetCommonVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 98304);
+	glBindVertexArray(0);
+	/****************************************/
+	/*          Planet 0 ends here          */
+	/****************************************/
 
 	//static float rotationX = 0.0, rotationY = 0.0;
 
@@ -417,7 +456,7 @@ GLuint loadSphereTexture(string im)
 		SOIL_load_image(im.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
 
 	if (data) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		SOIL_free_image_data(data);
 	}
 	else {
@@ -426,8 +465,8 @@ GLuint loadSphereTexture(string im)
 	}
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	return textureID;
 }
 
@@ -533,9 +572,9 @@ int main(int argc, char* argv[])
 	main_window = glutCreateWindow("Project");
 
 	glewInit();
-	//glEnable(GL_DEPTH_TEST);
-	//glDepthFunc(GL_LESS);
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_CULL_FACE);
 
 	// lamp VAO
 	glGenVertexArrays(1, &lampVAO);
@@ -578,9 +617,18 @@ int main(int argc, char* argv[])
 	glBindBuffer(GL_ARRAY_BUFFER, planetCommonNormal);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-	planet0Texture = loadSphereTexture("io.jpg");
-	planet1Texture = loadSphereTexture("pluto.png");
-	planet2Texture = loadSphereTexture("neptune.jpg");
+	planet0_emissionMap = loadSphereTexture("mercator.jpg");
+	planet0_diffuseMap = loadSphereTexture("mercator.jpg");
+	planet0_specularMap = loadSphereTexture("mercator_specular.jpg");
+
+	planet1_diffuseMap = loadSphereTexture("pluto.png");
+	planet1_specularMap = loadSphereTexture("pluto.png");
+	planet1_emissionMap = loadSphereTexture("pluto.png");
+
+	planet2_diffuseMap = loadSphereTexture("neptune.jpg");
+	planet2_specularMap = loadSphereTexture("neptune.jpg");
+	planet2_emissionMap = loadSphereTexture("neptune.jpg");
+
 	planetCommonShader = installShaders("planetCommon.vs", "planetCommon.fs");
 
 
