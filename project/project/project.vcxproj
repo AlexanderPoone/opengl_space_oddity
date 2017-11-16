@@ -120,6 +120,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="asteroidCommon.fs" />
+    <None Include="asteroidCommon.vs" />
     <None Include="lamp.fs" />
     <None Include="lamp.vs" />
     <None Include="planetCommon.fs" />

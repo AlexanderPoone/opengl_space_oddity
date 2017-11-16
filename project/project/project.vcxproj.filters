@@ -38,5 +38,11 @@
     <None Include="planetCommon.vs">
       <Filter>Archivos de código fuente</Filter>
     </None>
+    <None Include="asteroidCommon.fs">
+      <Filter>Archivos de código fuente</Filter>
+    </None>
+    <None Include="asteroidCommon.vs">
+      <Filter>Archivos de código fuente</Filter>
+    </None>
   </ItemGroup>
 </Project>

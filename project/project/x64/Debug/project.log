@@ -1,7 +1,9 @@
 ﻿  main.cpp
 c:\users\alex poon\desktop\inav\project\includes\gl\glui.h(880): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-c:\users\alex poon\desktop\inav\project\project\main.cpp(417): warning C4101: 'height': unreferenced local variable
-c:\users\alex poon\desktop\inav\project\project\main.cpp(417): warning C4101: 'width': unreferenced local variable
-c:\users\alex poon\desktop\inav\project\project\main.cpp(560): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+c:\users\alex poon\desktop\inav\project\project\main.cpp(438): warning C4101: 'height': unreferenced local variable
+c:\users\alex poon\desktop\inav\project\project\main.cpp(438): warning C4101: 'width': unreferenced local variable
+c:\users\alex poon\desktop\inav\project\project\main.cpp(606): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+c:\users\alex poon\desktop\inav\project\project\main.cpp(720): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\alex poon\desktop\inav\project\project\main.cpp(724): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
   project.vcxproj -> C:\Users\Alex Poon\Desktop\inav\project\x64\Debug\project.exe
   project.vcxproj -> C:\Users\Alex Poon\Desktop\inav\project\x64\Debug\project.pdb (Partial PDB)
