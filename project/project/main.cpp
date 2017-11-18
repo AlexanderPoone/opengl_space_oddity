@@ -123,6 +123,10 @@ float lampVertices[] = {
 	-0.1f,  0.1f, -0.1f
 };
 
+const int WIDTH = 1200;
+const int HEIGHT = 800;
+const float ASPECT = float(WIDTH) / HEIGHT;   // desired aspect ratio
+
 glm::vec3 lightPos(-0.05f, -0.05f, -0.5f);
 glm::vec3 cameraPos(0.0f, 0.0f, 0.0f);
 
@@ -135,7 +139,13 @@ GLuint planet0_diffuseMap, planet0_specularMap, planet0_emissionMap;
 GLuint planet1_diffuseMap, planet1_specularMap, planet1_emissionMap;
 GLuint planet2_diffuseMap, planet2_specularMap, planet2_emissionMap;
 
-GLuint amount = 1000, asteroidCommonVBO, asteroidCommonUV, asteroidCommonNormal, asteroidCommonInstanced, asteroidCommonDrawSize, asteroidCommonTexture, asteroidCommonShader;
+GLuint starVAO, starVBO, starCommonNormal, starCommonTexture, starCommonShader;
+
+glm::mat4 vehicleHistory[10];
+
+GLuint vehicleVAO, vehicleVBO, vehicleUV, vehicleNormal, vehicleShader, vehicleTexture;
+
+GLuint amount = 200, asteroidCommonVBO, asteroidCommonUV, asteroidCommonNormal, asteroidCommonInstanced, asteroidCommonDrawSize, asteroidCommonTexture, asteroidCommonShader;
 std::vector<GLuint> asteroidVAO;
 
 GLfloat planet0_rotationAngle = 0.0f;
@@ -158,16 +168,17 @@ void myGlutIdle(void)
 
 /**************************************** myGlutReshape() *************/
 
-void myGlutReshape(int x, int y)
+void myGlutReshape(int width, int height)
 {
-	float xy_aspect;
-
-	xy_aspect = (float)x / (float)y;
 	GLUI_Master.auto_set_viewport();
-
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glFrustum(-xy_aspect*.08, xy_aspect*.08, -.08, .08, .1, 15.0);
+
+	int w = height * ASPECT;           // w is width adjusted for aspect ratio
+	int left = (width - w) / 2;
+	glViewport(left/2, 0, w, height);       // fix up the viewport to maintain aspect ratio
+	gluOrtho2D(0, WIDTH, HEIGHT, 0);   // only the window is changing, not the camera
+	glMatrixMode(GL_MODELVIEW);
 
 	glutPostRedisplay();
 }
@@ -229,7 +240,7 @@ void myGlutDisplay(void)
 
 	glUniform3fv(glGetUniformLocation(planetCommonShader, "light.position"), 1, &lightPos[0]);
 	glUniform3fv(glGetUniformLocation(planetCommonShader, "viewPos"), 1, &cameraPos[0]);
-	std::cout << glGetError() << std::endl; // returns 0 (no error)
+	//std::cout << glGetError() << std::endl; // returns 0 (no error)
 
 	glm::vec3 lightAmbient(0.2f, 0.2f, 0.2f);
 	glm::vec3 lightDiffuse(0.5f, 0.5f, 0.5f);
@@ -259,12 +270,30 @@ void myGlutDisplay(void)
 	glBindTexture(GL_TEXTURE_2D, planet0_emissionMap);
 	// render the sphere
 	glBindVertexArray(planetCommonVAO);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 98304);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 153600); //98304
 	glBindVertexArray(0);
 	/****************************************/
 	/*          Planet 0 ends here          */
 	/****************************************/
-
+	model = glm::scale(model, glm::vec3(1.5f, 1.5f, 1.0f));
+	model = glm::translate(model, glm::vec3(3.8f, 1.3f, 0.0f));
+	// rebind model matrix
+	glUniformMatrix4fv(glGetUniformLocation(planetCommonShader, "model"), 1, GL_FALSE, &model[0][0]);
+	materialShininess = 100.0f;
+	glUniform1f(glGetUniformLocation(planetCommonShader, "material.shininess"), materialShininess);
+	// bind diffuse map
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, planet1_diffuseMap);
+	// bind specular map
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, planet1_specularMap);
+	// bind emission map
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, planet1_emissionMap);
+	// render the sphere
+	glBindVertexArray(planetCommonVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 153600); //98304
+	glBindVertexArray(0);
 
 	/****************************************/
 	/*        Asteroids starts here         */
@@ -280,7 +309,60 @@ void myGlutDisplay(void)
 	}
 	glBindVertexArray(0);
 	/****************************************/
-	/*        Asteroids starts here         */
+	/*         Asteroids ends here          */
+	/****************************************/
+
+	/****************************************/
+	/*      Space Vehicle starts here       */
+	/****************************************/
+	model = glm::mat4(1.0f);
+	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+	model = glm::translate(model, glm::vec3(0.5f, 0.5f, 0.0f));
+	glUseProgram(vehicleShader);
+	//Store past model matrices in buffer!!!
+
+	glUniform3fv(glGetUniformLocation(vehicleShader, "light.position"), 1, &lightPos[0]);
+	glUniform3fv(glGetUniformLocation(vehicleShader, "viewPos"), 1, &cameraPos[0]);
+	//std::cout << glGetError() << std::endl; // returns 0 (no error)
+
+	glUniform3fv(glGetUniformLocation(vehicleShader, "light.ambient"), 1, &lightAmbient[0]);
+	glUniform3fv(glGetUniformLocation(vehicleShader, "light.diffuse"), 1, &lightDiffuse[0]);
+	glUniform3fv(glGetUniformLocation(vehicleShader, "light.specular"), 1, &lightSpecular[0]);
+
+	glUniformMatrix4fv(glGetUniformLocation(vehicleShader, "model"), 1, GL_FALSE, &model[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(vehicleShader, "view"), 1, GL_FALSE, &view[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(vehicleShader, "projection"), 1, GL_FALSE, &projection[0][0]);
+
+	glUniform1i(glGetUniformLocation(vehicleShader, "material.emission"), 0);				//sampler
+	glUniform1i(glGetUniformLocation(vehicleShader, "material.diffuse"), 1);				//sampler
+	glUniform1i(glGetUniformLocation(vehicleShader, "material.specular"), 2);				//sampler
+	materialShininess = 64.0f;															//but not this one
+	glUniform1f(glGetUniformLocation(vehicleShader, "material.shininess"), materialShininess);
+
+	// bind diffuse map
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, vehicleTexture);
+	// bind specular map
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, vehicleTexture);
+	// bind emission map
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, vehicleTexture);
+	// render the vehicle
+	glBindVertexArray(vehicleVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 154959);
+	glBindVertexArray(0);
+	/****************************************/
+	/*       Space Vehicle ends here        */
+	/****************************************/
+
+	/****************************************/
+	/*        Star Trail starts here        */
+	/****************************************/
+	//glDrawArrays(GL_TRIANGLE_STRIP, 0, 8487);
+	glBindVertexArray(0);
+	/****************************************/
+	/*         Star Trail ends here         */
 	/****************************************/
 
 
@@ -516,6 +598,31 @@ GLuint loadSphereTexture(string im)
 	return textureID;
 }
 
+GLuint loadStarTexture(string im)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	int width, height;
+
+	unsigned char* data =
+		SOIL_load_image(im.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
+
+	if (data) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		SOIL_free_image_data(data);
+	}
+	else {
+		std::cout << "Star texture failed to load at path: " << im << std::endl;
+		SOIL_free_image_data(data);
+	}
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	return textureID;
+}
+
 bool checkStatus(
 	GLuint objectID,
 	PFNGLGETSHADERIVPROC objectPropertyGetterFunc,
@@ -613,7 +720,7 @@ int main(int argc, char* argv[])
 
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowPosition(50, 50);
-	glutInitWindowSize(800, 500);
+	glutInitWindowSize(1400, 600);
 
 	main_window = glutCreateWindow("Project");
 
@@ -637,7 +744,7 @@ int main(int argc, char* argv[])
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
-	loadOBJ("io.obj", vertices, uvs, normals);
+	loadOBJ("io2.obj", vertices, uvs, normals);
 	glGenVertexArrays(1, &planetCommonVAO);
 
 	// Planet Vertices
@@ -663,13 +770,16 @@ int main(int argc, char* argv[])
 	glBindBuffer(GL_ARRAY_BUFFER, planetCommonNormal);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-	planet0_emissionMap = loadSphereTexture("mercator.jpg");
-	planet0_diffuseMap = loadSphereTexture("mercator.jpg");
-	planet0_specularMap = loadSphereTexture("mercator_specular.jpg");
+	planet0_emissionMap = loadSphereTexture("myearth.jpg");
+	planet0_diffuseMap = loadSphereTexture("myearth.jpg");
+	planet0_specularMap = loadSphereTexture("myearth_specular.jpg");
+	//planet0_emissionMap = loadSphereTexture("webmercator.png");
+	//planet0_diffuseMap = loadSphereTexture("webmercator.png");
+	//planet0_specularMap = loadSphereTexture("webmercator.png");
 
-	planet1_diffuseMap = loadSphereTexture("pluto.png");
-	planet1_specularMap = loadSphereTexture("pluto.png");
-	planet1_emissionMap = loadSphereTexture("pluto.png");
+	planet1_diffuseMap = loadSphereTexture("io.jpg");
+	planet1_specularMap = loadSphereTexture("io.jpg");
+	planet1_emissionMap = loadSphereTexture("io_specular.jpg");
 
 	planet2_diffuseMap = loadSphereTexture("neptune.jpg");
 	planet2_specularMap = loadSphereTexture("neptune.jpg");
@@ -693,12 +803,10 @@ int main(int argc, char* argv[])
 	glGenBuffers(1, &asteroidCommonVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, asteroidCommonVBO);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-
 	// Asteroids UVs
 	glGenBuffers(1, &asteroidCommonUV);
 	glBindBuffer(GL_ARRAY_BUFFER, asteroidCommonUV);
 	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
-
 	// Asteroids Normals
 	glGenBuffers(1, &asteroidCommonNormal);
 	glBindBuffer(GL_ARRAY_BUFFER, asteroidCommonNormal);				// VBO
@@ -773,6 +881,41 @@ int main(int argc, char* argv[])
 	asteroidCommonTexture = loadAsteroidTexture("asteroid.jpg");
 	asteroidCommonShader = installShaders("asteroidCommon.vs", "asteroidCommon.fs");
 
+	// space vehicle 154959
+	vertices.clear();
+	uvs.clear();
+	normals.clear();
+	loadOBJ("Arc170.obj", vertices, uvs, normals);
+	glGenVertexArrays(1, &vehicleVAO);
+
+	// Vechicle Vertices
+	glGenBuffers(1, &vehicleVBO);
+	glBindVertexArray(vehicleVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, vehicleVBO);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+	// Vehicle UVs
+	glGenBuffers(1, &vehicleUV);
+	glBindBuffer(GL_ARRAY_BUFFER, vehicleUV);
+	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
+	// Vehicle Normals
+	glGenBuffers(1, &vehicleNormal);
+	glBindBuffer(GL_ARRAY_BUFFER, vehicleNormal);
+	glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+	vehicleTexture = loadSphereTexture("shiny-metal-background.jpg");
+	vehicleShader = installShaders("planetCommon.vs", "planetCommon.fs");
+
+	//// starfy trail 8478
+	//vertices.clear();
+	//uvs.clear();
+	//normals.clear();
+	//loadOBJ("starfy.obj", vertices, uvs, normals);
+	////starCommonTexture = loadStarTexture("");
+	//starCommonShader = installShaders("planetCommon.vs", "planetCommon.fs");
+
+	vertices.clear();
+	uvs.clear();
+	normals.clear();
+
 	// skybox VAO
 	glGenVertexArrays(1, &skyboxVAO);
 	glGenBuffers(1, &skyboxVBO);
@@ -786,7 +929,7 @@ int main(int argc, char* argv[])
 	skyboxShader = installShaders("skybox.vs", "skybox.fs");
 
 	glutDisplayFunc(myGlutDisplay);
-	//glutReshapeFunc(myGlutReshape);
+	glutReshapeFunc(myGlutReshape);
 
 	///****************************************/
 	///*       Set up OpenGL lights           */
@@ -817,13 +960,15 @@ int main(int argc, char* argv[])
 
 	glui->set_main_gfx_window(main_window);
 	glui->add_separator();
-	glui->add_statictext("iNavigation@CUHK");
+	GLUI_StaticText *heading = glui->add_statictext("iNavigation@CUHK");
+	heading->set_alignment(GLUI_ALIGN_CENTER);
 	glui->add_separator();
 
-	glui->add_checkbox("Wireframe", &wireframe);
+	//glui->add_checkbox("Wireframe", &wireframe);
 	GLUI_Spinner *segment_spinner =
-		glui->add_spinner("Segments:", GLUI_SPINNER_INT, &segments);
-	segment_spinner->set_int_limits(3, 60);
+		glui->add_spinner("Vehicle_S:", GLUI_SPINNER_FLOAT, &segments);
+	segment_spinner->set_float_limits(0.0f,10.0f,GLUI_LIMIT_WRAP);
+	segment_spinner->set_float_val(1.5f);
 
 	GLUI_Listbox *listbox = glui->add_listbox("A listbox");
 	listbox->add_item(1, "Red");
@@ -833,7 +978,7 @@ int main(int argc, char* argv[])
 	GLUI_Rollout *render_rollout = glui->add_rollout("Render Control");
 
 	GLUI_Panel *obj_panel = glui->add_panel_to_panel(render_rollout, "Viewpoint");
-	GLUI_RadioGroup *group1 = glui->add_radiogroup_to_panel(obj_panel);
+	GLUI_RadioGroup *group1 = glui->add_radiogroup_to_panel(obj_panel, &fogColorId, 16, glui_callback);
 	glui->add_radiobutton_to_group(group1, "Left");
 	glui->add_radiobutton_to_group(group1, "Top");
 	glui->add_radiobutton_to_group(group1, "Vehicle");
