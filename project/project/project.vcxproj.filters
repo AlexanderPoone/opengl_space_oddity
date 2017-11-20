@@ -44,11 +44,5 @@
     <None Include="asteroidCommon.vs">
       <Filter>Archivos de código fuente</Filter>
     </None>
-    <None Include="fog.fs">
-      <Filter>Archivos de código fuente</Filter>
-    </None>
-    <None Include="fog.vs">
-      <Filter>Archivos de código fuente</Filter>
-    </None>
   </ItemGroup>
 </Project>
