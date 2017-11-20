@@ -122,6 +122,8 @@
   <ItemGroup>
     <None Include="asteroidCommon.fs" />
     <None Include="asteroidCommon.vs" />
+    <None Include="fog.fs" />
+    <None Include="fog.vs" />
     <None Include="lamp.fs" />
     <None Include="lamp.vs" />
     <None Include="planetCommon.fs" />

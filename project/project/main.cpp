@@ -143,7 +143,7 @@ GLuint starVAO, starVBO, starCommonNormal, starCommonTexture, starCommonShader;
 
 glm::mat4 vehicleHistory[10];
 
-GLuint vehicleVAO, vehicleVBO, vehicleUV, vehicleNormal, vehicleShader, vehicleTexture;
+GLuint vehicleVAO, vehicleVBO, vehicleUV, vehicleNormal, vehicleShader, vehicle_diffuseMap, vehicle_specularMap, vehicle_emissionMap;
 
 GLuint amount = 200, asteroidCommonVBO, asteroidCommonUV, asteroidCommonNormal, asteroidCommonInstanced, asteroidCommonDrawSize, asteroidCommonTexture, asteroidCommonShader;
 std::vector<GLuint> asteroidVAO;
@@ -316,14 +316,14 @@ void myGlutDisplay(void)
 	/*      Space Vehicle starts here       */
 	/****************************************/
 	model = glm::mat4(1.0f);
-	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
-	model = glm::translate(model, glm::vec3(0.5f, 0.5f, 0.0f));
+	model = glm::scale(model, glm::vec3(0.02f));
+	model = glm::translate(model, glm::vec3(-0.5f, -0.5f, -8.0f));
 	glUseProgram(vehicleShader);
 	//Store past model matrices in buffer!!!
 
 	glUniform3fv(glGetUniformLocation(vehicleShader, "light.position"), 1, &lightPos[0]);
 	glUniform3fv(glGetUniformLocation(vehicleShader, "viewPos"), 1, &cameraPos[0]);
-	//std::cout << glGetError() << std::endl; // returns 0 (no error)
+	std::cout << glGetError() << std::endl; // returns 0 (no error)
 
 	glUniform3fv(glGetUniformLocation(vehicleShader, "light.ambient"), 1, &lightAmbient[0]);
 	glUniform3fv(glGetUniformLocation(vehicleShader, "light.diffuse"), 1, &lightDiffuse[0]);
@@ -341,16 +341,16 @@ void myGlutDisplay(void)
 
 	// bind diffuse map
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, vehicleTexture);
+	glBindTexture(GL_TEXTURE_2D, vehicle_diffuseMap);
 	// bind specular map
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, vehicleTexture);
+	glBindTexture(GL_TEXTURE_2D, vehicle_specularMap);
 	// bind emission map
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, vehicleTexture);
+	glBindTexture(GL_TEXTURE_2D, vehicle_emissionMap);
 	// render the vehicle
 	glBindVertexArray(vehicleVAO);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 154959);
+	glDrawArrays(GL_TRIANGLES, 0, 154959);
 	glBindVertexArray(0);
 	/****************************************/
 	/*       Space Vehicle ends here        */
@@ -791,7 +791,7 @@ int main(int argc, char* argv[])
 	glm::mat4* modelMatrices;
 	modelMatrices = new glm::mat4[amount];
 	srand(glutGet(GLUT_ELAPSED_TIME)); // initialize random seed	
-	float radius = 15.0f;
+	float radius = 12.0f;
 	float offset = 2.5f;
 
 	vertices.clear();
@@ -888,20 +888,32 @@ int main(int argc, char* argv[])
 	loadOBJ("Arc170.obj", vertices, uvs, normals);
 	glGenVertexArrays(1, &vehicleVAO);
 
-	// Vechicle Vertices
+	// Planet Vertices
 	glGenBuffers(1, &vehicleVBO);
 	glBindVertexArray(vehicleVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, vehicleVBO);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-	// Vehicle UVs
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vehicleVBO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	// Planet UVs
 	glGenBuffers(1, &vehicleUV);
 	glBindBuffer(GL_ARRAY_BUFFER, vehicleUV);
 	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
-	// Vehicle Normals
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, vehicleUV);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	// Planet Normals
 	glGenBuffers(1, &vehicleNormal);
 	glBindBuffer(GL_ARRAY_BUFFER, vehicleNormal);
 	glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
-	vehicleTexture = loadSphereTexture("shiny-metal-background.jpg");
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, vehicleNormal);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	vehicle_diffuseMap = loadSphereTexture("shiny-metal-background.jpg");
+	vehicle_specularMap = loadSphereTexture("shiny-metal-background-specular.jpg");
+	vehicle_emissionMap = loadSphereTexture("shiny-metal-background.jpg");
 	vehicleShader = installShaders("planetCommon.vs", "planetCommon.fs");
 
 	//// starfy trail 8478
