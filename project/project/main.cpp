@@ -458,6 +458,16 @@ void myGlutKeyboard(unsigned char key, int x, int y) {
 	{
 		ver -= 0.1f;
 	}
+	if (key == '\033')
+	{
+		exit(0);
+	}
+}
+
+void myGlutMouse(int button, int state, int x, int y) {
+	////TODO: 
+	//moveX = (256.0 - x) / 128.0;
+	//moveY = (y - 256.0) / 128.0;
 }
 
 void glui_callback(int control_id) {
@@ -1067,7 +1077,7 @@ int main(int argc, char* argv[])
 
 	/* We register the idle callback with GLUI, *not* with GLUT */
 	GLUI_Master.set_glutKeyboardFunc(myGlutKeyboard);
-	//GLUI_Master.set_glutMouseFunc();
+	GLUI_Master.set_glutMouseFunc(myGlutMouse);
 
 	GLUI_Master.set_glutIdleFunc(myGlutIdle);
 	GLUI_Master.set_glutReshapeFunc(myGlutReshape);
