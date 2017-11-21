@@ -147,7 +147,7 @@ std::vector<GLuint> asteroidVAO;
 
 GLuint starCommonVAO, starVBO, starCommonUV, starCommonNormal, star_diffuseMap, star_specularMap, star_emissionMap, starCommonShader;
 
-GLuint starSpacing = 0;
+GLfloat diffuse = 0.5f;
 
 glm::vec4 FogRealColor(.8f, .8f, .8f, 1.0f); // vec4 FogRealColor = vec4(0.0f, 0.467f, 0.745f, 1.0f);
 
@@ -155,6 +155,7 @@ int FogFlag=0;
 
 std::deque<glm::mat4> vehicleHistory;
 
+GLfloat lightPos_translate=0.0f, lightPos_step=0.005f;
 GLfloat planet0_rotationAngle = 0.0f;
 
 int fogColorId;
@@ -206,6 +207,12 @@ void myGlutDisplay(void)
 	);
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)800 / (float)500, 0.1f, 100.0f);
 
+	lightPos_translate += lightPos_step;
+
+	if (lightPos_translate >= 0.25f) lightPos_step = -0.005f;
+	else if (lightPos_translate <= -0.25f) lightPos_step = 0.005f;
+
+	lightPos = glm::vec3(-0.05f + lightPos_translate, -0.05f, -0.4f);
 
 	// draw skybox as last
 	glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
@@ -256,7 +263,7 @@ void myGlutDisplay(void)
 	//std::cout << glGetError() << std::endl; // returns 0 (no error)
 
 	glm::vec3 lightAmbient(0.2f, 0.2f, 0.2f);
-	glm::vec3 lightDiffuse(0.5f, 0.5f, 0.5f);
+	glm::vec3 lightDiffuse(diffuse, diffuse, diffuse);
 	glm::vec3 lightSpecular(1.0f, 1.0f, 1.0f);
 	glUniform3fv(glGetUniformLocation(planetCommonShader, "light.ambient"), 1, &lightAmbient[0]);
 	glUniform3fv(glGetUniformLocation(planetCommonShader, "light.diffuse"), 1, &lightDiffuse[0]);
@@ -368,10 +375,7 @@ void myGlutDisplay(void)
 
 	glUseProgram(vehicleShader);
 	//Store past model matrices in buffer!!!
-	//if (starSpacing == 0) 
-		vehicleHistory.push_back(model);
-	//starSpacing++;
-	//if (starSpacing == 11) starSpacing = 0;
+	vehicleHistory.push_back(model);
 
 	glUniform3fv(glGetUniformLocation(vehicleShader, "light.position"), 1, &lightPos[0]);
 	glUniform3fv(glGetUniformLocation(vehicleShader, "viewPos"), 1, &cameraPos[0]);
@@ -509,6 +513,18 @@ void myGlutKeyboard(unsigned char key, int x, int y) {
 	if ((key == 'w' || key == 'W') && (ver < 1.0f))
 	{
 		ver += 0.1f;
+	}
+	if ((key == 's' || key == 'S') && (ver > -1.0f))
+	{
+		ver -= 0.1f;
+	}
+	if (key == 'i' || key == 'I')
+	{
+		diffuse += 0.1f;
+	}
+	if (key == 'k' || key == 'K')
+	{
+		diffuse -= 0.1f;
 	}
 	if ((key == 's' || key == 'S') && (ver > -1.0f))
 	{
