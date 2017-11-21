@@ -3,6 +3,7 @@
 #include <string.h>
 #include <fstream>
 #include <vector>
+#include <deque>
 #include "GL/glew.h"
 #include "GL/glut.h"
 #include "GL/glui.h"
@@ -139,18 +140,20 @@ GLuint planet0_diffuseMap, planet0_specularMap, planet0_emissionMap;
 GLuint planet1_diffuseMap, planet1_specularMap, planet1_emissionMap;
 GLuint planet2_diffuseMap, planet2_specularMap, planet2_emissionMap;
 
-GLuint starVAO, starVBO, starCommonNormal, starCommonTexture, starCommonShader;
+GLuint vehicleVAO, vehicleVBO, vehicleUV, vehicleNormal, vehicleShader, vehicle_diffuseMap, vehicle_specularMap, vehicle_emissionMap;
+
+GLuint amount = 100, asteroidCommonVBO, asteroidCommonUV, asteroidCommonNormal, asteroidCommonInstanced, asteroidCommonDrawSize, asteroidCommonTexture, asteroidCommonShader;
+std::vector<GLuint> asteroidVAO;
+
+GLuint starCommonVAO, starVBO, starCommonUV, starCommonNormal, star_diffuseMap, star_specularMap, star_emissionMap, starCommonShader;
+
+GLuint starSpacing = 0;
 
 glm::vec4 FogRealColor(.8f, .8f, .8f, 1.0f); // vec4 FogRealColor = vec4(0.0f, 0.467f, 0.745f, 1.0f);
 
 int FogFlag=0;
 
-glm::mat4 vehicleHistory[10];
-
-GLuint vehicleVAO, vehicleVBO, vehicleUV, vehicleNormal, vehicleShader, vehicle_diffuseMap, vehicle_specularMap, vehicle_emissionMap;
-
-GLuint amount = 200, asteroidCommonVBO, asteroidCommonUV, asteroidCommonNormal, asteroidCommonInstanced, asteroidCommonDrawSize, asteroidCommonTexture, asteroidCommonShader;
-std::vector<GLuint> asteroidVAO;
+std::deque<glm::mat4> vehicleHistory;
 
 GLfloat planet0_rotationAngle = 0.0f;
 
@@ -360,11 +363,15 @@ void myGlutDisplay(void)
 		* glm::rotate(glm::mat4(), glm::radians(-planet0_rotationAngle), glm::vec3(0.0f, 0.0f, 1.0f))
 		* glm::translate(glm::mat4(), glm::vec3(0.2f, 0.0f, 0.0f))
 		* glm::scale(glm::mat4(), glm::vec3(0.02f))
-		* glm::rotate(glm::mat4(), glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f))
+		* glm::rotate(glm::mat4(), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f))
 		* glm::mat4(1.0f);
 
 	glUseProgram(vehicleShader);
 	//Store past model matrices in buffer!!!
+	//if (starSpacing == 0) 
+		vehicleHistory.push_back(model);
+	//starSpacing++;
+	//if (starSpacing == 11) starSpacing = 0;
 
 	glUniform3fv(glGetUniformLocation(vehicleShader, "light.position"), 1, &lightPos[0]);
 	glUniform3fv(glGetUniformLocation(vehicleShader, "viewPos"), 1, &cameraPos[0]);
@@ -406,8 +413,57 @@ void myGlutDisplay(void)
 	/****************************************/
 	/*        Star Trail starts here        */
 	/****************************************/
-	//glDrawArrays(GL_TRIANGLE_STRIP, 0, 8487);
-	glBindVertexArray(0);
+	if (vehicleHistory.size() == 120) {
+
+		model = vehicleHistory.front()
+			* glm::scale(glm::mat4(), glm::vec3(.1f, .1f, .1f))
+			* glm::mat4();
+		glUseProgram(starCommonShader);
+
+		glUniform3fv(glGetUniformLocation(starCommonShader, "light.position"), 1, &lightPos[0]);
+		glUniform3fv(glGetUniformLocation(starCommonShader, "viewPos"), 1, &cameraPos[0]);
+
+		glUniform3fv(glGetUniformLocation(starCommonShader, "light.ambient"), 1, &lightAmbient[0]);
+		glUniform3fv(glGetUniformLocation(starCommonShader, "light.diffuse"), 1, &lightDiffuse[0]);
+		glUniform3fv(glGetUniformLocation(starCommonShader, "light.specular"), 1, &lightSpecular[0]);
+
+		glUniformMatrix4fv(glGetUniformLocation(starCommonShader, "model"), 1, GL_FALSE, &model[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(starCommonShader, "view"), 1, GL_FALSE, &view[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(starCommonShader, "projection"), 1, GL_FALSE, &projection[0][0]);
+
+		glUniform1i(glGetUniformLocation(starCommonShader, "material.emission"), 0);				//sampler
+		glUniform1i(glGetUniformLocation(starCommonShader, "material.diffuse"), 1);				//sampler
+		glUniform1i(glGetUniformLocation(starCommonShader, "material.specular"), 2);				//sampler
+		materialShininess = 64.0f;															//but not this one
+		glUniform1f(glGetUniformLocation(starCommonShader, "material.shininess"), materialShininess);
+		glUniform1i(glGetUniformLocation(starCommonShader, "FogFlag"), FogFlag);
+		glUniform4fv(glGetUniformLocation(starCommonShader, "FogRealColor"), 1, &FogRealColor[0]);
+
+		// bind diffuse map
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, star_diffuseMap);
+		// bind specular map
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, star_specularMap);
+		// bind emission map
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, star_emissionMap);
+		// render the last star (smallest)
+		glBindVertexArray(starCommonVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 8487);
+		vehicleHistory.pop_front();
+		for (int x = 1; x < 9; x++) {
+			// render eight stars from second last to first (bigger and bigger)
+			model = vehicleHistory[x*11]
+				* glm::scale(glm::mat4(), glm::vec3(.1f+.01f*x, .1f+.01f*x, .1f+.01f*x))
+				* glm::mat4();
+			// Rebind the model matrix
+			glUniformMatrix4fv(glGetUniformLocation(starCommonShader, "model"), 1, GL_FALSE, &model[0][0]);
+			glBindVertexArray(starCommonVAO);
+			glDrawArrays(GL_TRIANGLES, 0, 8487);
+		}
+		glBindVertexArray(0);
+	}
 	/****************************************/
 	/*         Star Trail ends here         */
 	/****************************************/
@@ -835,9 +891,6 @@ int main(int argc, char* argv[])
 	planet0_emissionMap = loadSphereTexture("myearth.jpg");
 	planet0_diffuseMap = loadSphereTexture("myearth.jpg");
 	planet0_specularMap = loadSphereTexture("myearth_specular.jpg");
-	//planet0_emissionMap = loadSphereTexture("webmercator.png");
-	//planet0_diffuseMap = loadSphereTexture("webmercator.png");
-	//planet0_specularMap = loadSphereTexture("webmercator.png");
 
 	planet1_diffuseMap = loadSphereTexture("io.jpg");
 	planet1_specularMap = loadSphereTexture("io.jpg");
@@ -853,8 +906,8 @@ int main(int argc, char* argv[])
 	glm::mat4* modelMatrices;
 	modelMatrices = new glm::mat4[amount];
 	srand(glutGet(GLUT_ELAPSED_TIME)); // initialize random seed	
-	float radius = 12.0f;
-	float offset = 2.5f;
+	float radius = 3.0f;
+	float offset = 0.1f;
 
 	vertices.clear();
 	uvs.clear();
@@ -875,7 +928,10 @@ int main(int argc, char* argv[])
 	glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
 
 	for (unsigned int i = 0; i < amount; i++) {
-		glm::mat4 model;
+		glm::mat4 model=
+			glm::translate(glm::mat4(), glm::vec3(0.8f, 0.3f, -1.0f))
+			* glm::scale(glm::mat4(), glm::vec3(0.05f))
+			* glm::mat4(); //			glm::translate(glm::mat4(), glm::vec3(0.3f, 0.0f, -0.9f))
 		// 1. translation: displace along circle with 'radius' in range [-offset, offset]
 		float angle = (float)i / (float)amount * 360.0f;
 		float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
@@ -978,13 +1034,37 @@ int main(int argc, char* argv[])
 	vehicle_emissionMap = loadSphereTexture("shiny-metal-background.jpg");
 	vehicleShader = installShaders("planetCommon.vs", "planetCommon.fs");
 
-	//// starfy trail 8478
-	//vertices.clear();
-	//uvs.clear();
-	//normals.clear();
-	//loadOBJ("starfy.obj", vertices, uvs, normals);
-	////starCommonTexture = loadStarTexture("");
-	//starCommonShader = installShaders("planetCommon.vs", "planetCommon.fs");
+	// starfy trail 8478
+	vertices.clear();
+	uvs.clear();
+	normals.clear();
+	loadOBJ("starfy.obj", vertices, uvs, normals);
+	// Star Vertices
+	glGenBuffers(1, &starVBO);
+	glBindVertexArray(starCommonVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, starVBO);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, starVBO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	// Star UVs
+	glGenBuffers(1, &starCommonUV);
+	glBindBuffer(GL_ARRAY_BUFFER, starCommonUV);
+	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, starCommonUV);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	// Star Normals
+	glGenBuffers(1, &starCommonNormal);
+	glBindBuffer(GL_ARRAY_BUFFER, starCommonNormal);
+	glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, starCommonNormal);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	star_diffuseMap = loadStarTexture("starfy.bmp");
+	star_specularMap = loadStarTexture("starfy.bmp");
+	star_emissionMap = loadStarTexture("starfy.bmp");
+	starCommonShader = installShaders("planetCommon.vs", "planetCommon.fs");
 
 	vertices.clear();
 	uvs.clear();

@@ -1,10 +1,11 @@
-﻿  main.cpp
+﻿cl : Command line warning D9028: minimal rebuild failure, reverting to normal build
+  main.cpp
 c:\users\alex poon\desktop\inav\project\includes\gl\glui.h(880): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-c:\users\alex poon\desktop\inav\project\project\main.cpp(181): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-c:\users\alex poon\desktop\inav\project\project\main.cpp(582): warning C4101: 'height': unreferenced local variable
-c:\users\alex poon\desktop\inav\project\project\main.cpp(582): warning C4101: 'width': unreferenced local variable
-c:\users\alex poon\desktop\inav\project\project\main.cpp(775): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
-c:\users\alex poon\desktop\inav\project\project\main.cpp(890): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\alex poon\desktop\inav\project\project\main.cpp(894): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\alex poon\desktop\inav\project\project\main.cpp(184): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+c:\users\alex poon\desktop\inav\project\project\main.cpp(638): warning C4101: 'height': unreferenced local variable
+c:\users\alex poon\desktop\inav\project\project\main.cpp(638): warning C4101: 'width': unreferenced local variable
+c:\users\alex poon\desktop\inav\project\project\main.cpp(831): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+c:\users\alex poon\desktop\inav\project\project\main.cpp(946): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\alex poon\desktop\inav\project\project\main.cpp(950): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
   project.vcxproj -> C:\Users\Alex Poon\Desktop\inav\project\x64\Debug\project.exe
   project.vcxproj -> C:\Users\Alex Poon\Desktop\inav\project\x64\Debug\project.pdb (Partial PDB)
