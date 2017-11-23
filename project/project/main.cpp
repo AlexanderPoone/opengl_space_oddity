@@ -150,15 +150,21 @@ GLuint starCommonVAO, starVBO, starCommonUV, starCommonNormal, star_diffuseMap, 
 GLfloat diffuse = 0.5f;
 
 glm::vec4 FogRealColor(.8f, .8f, .8f, 1.0f); // vec4 FogRealColor = vec4(0.0f, 0.467f, 0.745f, 1.0f);
+glm::mat4 view=glm::lookAt(
+	glm::vec3(0, 0, 0),
+	glm::vec3(0, 0, -1),
+	glm::vec3(0, 1, 0)  // head is up (set to 0, -1, 0 to look upside down)
+);
+GLfloat vehiclePosX=0.0f, vehiclePosY=0.0f, vehiclePosZ=0.0f;
 
 int FogFlag=0;
 
 std::deque<glm::mat4> vehicleHistory;
 
 GLfloat lightPos_translate=0.0f, lightPos_step=0.005f;
-GLfloat planet0_rotationAngle = 0.0f;
+GLfloat planet0_rotationAngle = 0.0f, vehicle_rotationAngle = 0.0f, vehicle_s=0.5f;
 
-int fogColorId;
+int viewpointId=0, fogColorId;
 float hor = 0.0f, ver = 0.0f;
 
 /***************************************** myGlutIdle() ***********/
@@ -200,11 +206,35 @@ void myGlutDisplay(void)
 	glClearDepth(1);
 
 	glm::mat4 model = glm::mat4();
-	glm::mat4 view = glm::lookAt(
+	glm::mat4 view0 = glm::lookAt(
 		glm::vec3(0, 0, 0),
 		glm::vec3(hor, ver, -1),
 		glm::vec3(0, 1, 0)  // head is up (set to 0, -1, 0 to look upside down)
 	);
+	switch (viewpointId) {
+		case 0:
+			view = glm::lookAt(
+				glm::vec3(0, 0, 0),
+				glm::vec3(hor, ver, -1),
+				glm::vec3(0, 1, 0)  // head is up (set to 0, -1, 0 to look upside down)
+			);
+			break;
+		case 1:
+			view = glm::lookAt(
+				glm::vec3(0, 0.9f, -0.7),
+				glm::vec3(hor, ver, -0.7),
+				glm::vec3(0, 0, -0.7)  // head is up (set to 0, -1, 0 to look upside down)
+			);
+			break;
+		case 2:
+			view = glm::lookAt(
+				//cos sin, z is same with vehicle
+				glm::vec3(vehiclePosX, vehiclePosY, vehiclePosZ),
+				glm::vec3(hor, ver, vehiclePosZ),
+				glm::vec3(0, 1, 0)  // head is up (set to 0, -1, 0 to look upside down)
+			);
+			break;
+	}
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)800 / (float)500, 0.1f, 100.0f);
 
 	lightPos_translate += lightPos_step;
@@ -220,6 +250,8 @@ void myGlutDisplay(void)
 	glUseProgram(skyboxShader);
 	GLint viewUniformLocation = glGetUniformLocation(skyboxShader, "view");
 	glUniformMatrix4fv(viewUniformLocation, 1, GL_FALSE, &view[0][0]);
+	GLint view0UniformLocation = glGetUniformLocation(skyboxShader, "view0");
+	glUniformMatrix4fv(view0UniformLocation, 1, GL_FALSE, &view0[0][0]);
 	GLint projectionUniformLocation = glGetUniformLocation(skyboxShader, "projection");
 	glUniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, &projection[0][0]);
 	glUniform1i(glGetUniformLocation(skyboxShader, "FogFlag"), FogFlag);
@@ -239,6 +271,8 @@ void myGlutDisplay(void)
 	glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, &model[0][0]);
 	viewUniformLocation = glGetUniformLocation(lampShader, "view");
 	glUniformMatrix4fv(viewUniformLocation, 1, GL_FALSE, &view[0][0]);
+	view0UniformLocation = glGetUniformLocation(lampShader, "view0");
+	glUniformMatrix4fv(view0UniformLocation, 1, GL_FALSE, &view0[0][0]);
 	projectionUniformLocation = glGetUniformLocation(lampShader, "projection");
 	glUniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, &projection[0][0]);
 	glUniform1i(glGetUniformLocation(lampShader, "FogFlag"), FogFlag);
@@ -271,6 +305,7 @@ void myGlutDisplay(void)
 
 	glUniformMatrix4fv(glGetUniformLocation(planetCommonShader, "model"), 1, GL_FALSE, &model[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(planetCommonShader, "view"), 1, GL_FALSE, &view[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(planetCommonShader, "view0"), 1, GL_FALSE, &view0[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(planetCommonShader, "projection"), 1, GL_FALSE, &projection[0][0]);
 
 	glUniform1i(glGetUniformLocation(planetCommonShader, "material.emission"), 0);				//sampler
@@ -349,6 +384,7 @@ void myGlutDisplay(void)
 	/****************************************/
 	glUseProgram(asteroidCommonShader);
 	glUniformMatrix4fv(glGetUniformLocation(asteroidCommonShader, "view"), 1, GL_FALSE, &view[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(asteroidCommonShader, "view0"), 1, GL_FALSE, &view0[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(asteroidCommonShader, "projection"), 1, GL_FALSE, &projection[0][0]);
 	glUniform1i(glGetUniformLocation(asteroidCommonShader, "FogFlag"), FogFlag);
 	glUniform4fv(glGetUniformLocation(asteroidCommonShader, "FogRealColor"), 1, &FogRealColor[0]);
@@ -366,12 +402,17 @@ void myGlutDisplay(void)
 	/****************************************/
 	/*      Space Vehicle starts here       */
 	/****************************************/
+	vehicle_rotationAngle += vehicle_s;
 	model = glm::translate(glm::mat4(), glm::vec3(0.3f, 0.0f, -0.9f))
-		* glm::rotate(glm::mat4(), glm::radians(-planet0_rotationAngle), glm::vec3(0.0f, 0.0f, 1.0f))
+		* glm::rotate(glm::mat4(), glm::radians(vehicle_rotationAngle), glm::vec3(0.0f, 0.0f, 1.0f))
 		* glm::translate(glm::mat4(), glm::vec3(0.2f, 0.0f, 0.0f))
 		* glm::scale(glm::mat4(), glm::vec3(0.02f))
+		* glm::rotate(glm::mat4(), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f))
 		* glm::rotate(glm::mat4(), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f))
 		* glm::mat4(1.0f);
+	vehiclePosX = model[3][0];
+	vehiclePosY = model[3][1];
+	vehiclePosZ = model[3][2];
 
 	glUseProgram(vehicleShader);
 	//Store past model matrices in buffer!!!
@@ -387,6 +428,7 @@ void myGlutDisplay(void)
 
 	glUniformMatrix4fv(glGetUniformLocation(vehicleShader, "model"), 1, GL_FALSE, &model[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(vehicleShader, "view"), 1, GL_FALSE, &view[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(vehicleShader, "view0"), 1, GL_FALSE, &view0[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(vehicleShader, "projection"), 1, GL_FALSE, &projection[0][0]);
 
 	glUniform1i(glGetUniformLocation(vehicleShader, "material.emission"), 0);				//sampler
@@ -433,6 +475,7 @@ void myGlutDisplay(void)
 
 		glUniformMatrix4fv(glGetUniformLocation(starCommonShader, "model"), 1, GL_FALSE, &model[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(starCommonShader, "view"), 1, GL_FALSE, &view[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(starCommonShader, "view0"), 1, GL_FALSE, &view0[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(starCommonShader, "projection"), 1, GL_FALSE, &projection[0][0]);
 
 		glUniform1i(glGetUniformLocation(starCommonShader, "material.emission"), 0);				//sampler
@@ -545,7 +588,7 @@ void myGlutMouse(int button, int state, int x, int y) {
 void glui_callback(int control_id) {
 	switch (control_id) 
 	{
-		case 17:
+		case 17:	// fog colour
 			if (fogColorId == 0) {
 				FogRealColor = glm::vec4(.8f, .8f, .8f, 1.0f);
 				printf("Fog colour is white\n");
@@ -1134,21 +1177,20 @@ int main(int argc, char* argv[])
 	heading->set_alignment(GLUI_ALIGN_CENTER);
 	glui->add_separator();
 
-	//glui->add_checkbox("Wireframe", &wireframe);
 	GLUI_Spinner *segment_spinner =
-		glui->add_spinner("Vehicle_S:", GLUI_SPINNER_FLOAT, &segments);
-	segment_spinner->set_float_limits(0.0f,10.0f,GLUI_LIMIT_WRAP);
-	segment_spinner->set_float_val(1.5f);
+		glui->add_spinner("Vehicle_S:", GLUI_SPINNER_FLOAT, &vehicle_s);
+	segment_spinner->set_float_limits(0.0f,10.0f,GLUI_LIMIT_CLAMP);
+	//segment_spinner->set_float_val(1.5f);
 
-	GLUI_Listbox *listbox = glui->add_listbox("A listbox");
-	listbox->add_item(1, "Red");
-	listbox->add_item(2, "Green");
-	listbox->add_item(3, "Blue");
+	//GLUI_Listbox *listbox = glui->add_listbox("A listbox");
+	//listbox->add_item(1, "Red");
+	//listbox->add_item(2, "Green");
+	//listbox->add_item(3, "Blue");
 
 	GLUI_Rollout *render_rollout = glui->add_rollout("Render Control");
 
 	GLUI_Panel *obj_panel = glui->add_panel_to_panel(render_rollout, "Viewpoint");
-	GLUI_RadioGroup *group1 = glui->add_radiogroup_to_panel(obj_panel, &fogColorId, 16, glui_callback);
+	GLUI_RadioGroup *group1 = glui->add_radiogroup_to_panel(obj_panel, &viewpointId);
 	glui->add_radiobutton_to_group(group1, "Left");
 	glui->add_radiobutton_to_group(group1, "Top");
 	glui->add_radiobutton_to_group(group1, "Vehicle");

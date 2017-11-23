@@ -1,10 +1,10 @@
 ﻿  main.cpp
-c:\users\alex poon\desktop\inav\project\includes\gl\glui.h(880): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-c:\users\alex poon\desktop\inav\project\project\main.cpp(185): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-c:\users\alex poon\desktop\inav\project\project\main.cpp(654): warning C4101: 'height': unreferenced local variable
-c:\users\alex poon\desktop\inav\project\project\main.cpp(654): warning C4101: 'width': unreferenced local variable
-c:\users\alex poon\desktop\inav\project\project\main.cpp(847): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
-c:\users\alex poon\desktop\inav\project\project\main.cpp(962): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\alex poon\desktop\inav\project\project\main.cpp(966): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-  project.vcxproj -> C:\Users\Alex Poon\Desktop\inav\project\x64\Debug\project.exe
-  project.vcxproj -> C:\Users\Alex Poon\Desktop\inav\project\x64\Debug\project.pdb (Partial PDB)
+c:\users\alex poon\desktop\inav - copy\project\includes\gl\glui.h(880): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(191): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(697): warning C4101: 'height': unreferenced local variable
+c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(697): warning C4101: 'width': unreferenced local variable
+c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(890): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(1005): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(1009): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+  project.vcxproj -> C:\Users\Alex Poon\Desktop\inav - Copy\project\x64\Debug\project.exe
+  project.vcxproj -> C:\Users\Alex Poon\Desktop\inav - Copy\project\x64\Debug\project.pdb (Partial PDB)

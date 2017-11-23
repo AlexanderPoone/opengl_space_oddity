@@ -7,6 +7,7 @@ out float visibility;
 
 uniform mat4 model;
 uniform mat4 view;
+uniform mat4 view0;
 uniform mat4 projection;
 uniform int FogFlag;
 
@@ -14,7 +15,7 @@ void main()
 {
 //fog
 	if (FogFlag==1) {
-		float distance=length(view * model * vec4(aPos, 1.0));
+		float distance=length(view0 * model * vec4(aPos, 1.0));
 		visibility=exp(-pow(distance*FogDensity, FogGradient));
 		visibility=clamp(visibility, 0, 1);
 	} else {
