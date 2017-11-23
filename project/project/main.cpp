@@ -165,6 +165,7 @@ GLfloat lightPos_translate=0.0f, lightPos_step=0.005f;
 GLfloat planet0_rotationAngle = 0.0f, vehicle_rotationAngle = 0.0f, vehicle_s=0.5f;
 
 int viewpointId=0, fogColorId;
+GLUI_RadioGroup *group1;
 float hor = 0.0f, ver = 0.0f;
 
 /***************************************** myGlutIdle() ***********/
@@ -564,31 +565,42 @@ void myGlutKeyboard(unsigned char key, int x, int y) {
 	//Please set lower case ‘a’, s’, d’ as switch between 3 different viewpoints.
 	if ((key == 'a' || key == 'A'))
 	{
+		group1->set_selected(0);
+		viewpointId = 0;
+	}
+	if ((key == 's' || key == 'S'))
+	{
+		group1->set_selected(1);
+		viewpointId = 1;
+	}
+	if ((key == 'd' || key == 'D'))
+	{
+		group1->set_selected(2);
+		viewpointId = 2;
+	}
+	if ((key == 'f' || key == 'F'))
+	{
 		hor -= 0.1f;
 	}
-	if ((key == 'd' || key == 'D') && (hor < 1.0f))
+	if ((key == 'h' || key == 'H') && (hor < 1.0f))
 	{
 		hor += 0.1f;
 	}
-	if ((key == 'w' || key == 'W') && (ver < 1.0f))
+	if ((key == 't' || key == 'T') && (ver < 1.0f))
 	{
 		ver += 0.1f;
 	}
-	if ((key == 's' || key == 'S') && (ver > -1.0f))
+	if ((key == 'g' || key == 'G') && (ver > -1.0f))
 	{
 		ver -= 0.1f;
 	}
-	if (key == 'i' || key == 'I')
+	if (key == 'q' || key == 'Q')
 	{
 		diffuse += 0.1f;
 	}
-	if (key == 'k' || key == 'K')
+	if (key == 'e' || key == 'E')
 	{
 		diffuse -= 0.1f;
-	}
-	if ((key == 's' || key == 'S') && (ver > -1.0f))
-	{
-		ver -= 0.1f;
 	}
 	if (key == '\033')
 	{
@@ -1207,7 +1219,7 @@ int main(int argc, char* argv[])
 	GLUI_Rollout *render_rollout = glui->add_rollout("Render Control");
 
 	GLUI_Panel *obj_panel = glui->add_panel_to_panel(render_rollout, "Viewpoint");
-	GLUI_RadioGroup *group1 = glui->add_radiogroup_to_panel(obj_panel, &viewpointId);
+	group1 = glui->add_radiogroup_to_panel(obj_panel, &viewpointId);
 	glui->add_radiobutton_to_group(group1, "Left");
 	glui->add_radiobutton_to_group(group1, "Top");
 	glui->add_radiobutton_to_group(group1, "Vehicle");
