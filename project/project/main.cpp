@@ -81,47 +81,47 @@ float skyboxVertices[] = {
 
 float lampVertices[] = {
 	// positions
-	-0.1f, -0.1f, -0.1f,
-	0.1f, -0.1f, -0.1f,
-	0.1f,  0.1f, -0.1f,
-	0.1f,  0.1f, -0.1f,
 	-0.1f,  0.1f, -0.1f,
 	-0.1f, -0.1f, -0.1f,
+	0.1f, -0.1f, -0.1f,
+	0.1f, -0.1f, -0.1f,
+	0.1f,  0.1f, -0.1f,
+	-0.1f,  0.1f, -0.1f,
 
 	-0.1f, -0.1f,  0.1f,
+	-0.1f, -0.1f, -0.1f,
+	-0.1f,  0.1f, -0.1f,
+	-0.1f,  0.1f, -0.1f,
+	-0.1f,  0.1f,  0.1f,
+	-0.1f, -0.1f,  0.1f,
+
+	0.1f, -0.1f, -0.1f,
 	0.1f, -0.1f,  0.1f,
 	0.1f,  0.1f,  0.1f,
-	0.1f,  0.1f,  0.1f,
-	-0.1f,  0.1f,  0.1f,
-	-0.1f, -0.1f,  0.1f,
-
-	-0.1f,  0.1f,  0.1f,
-	-0.1f,  0.1f, -0.1f,
-	-0.1f, -0.1f, -0.1f,
-	-0.1f, -0.1f, -0.1f,
-	-0.1f, -0.1f,  0.1f,
-	-0.1f,  0.1f,  0.1f,
-
 	0.1f,  0.1f,  0.1f,
 	0.1f,  0.1f, -0.1f,
 	0.1f, -0.1f, -0.1f,
-	0.1f, -0.1f, -0.1f,
-	0.1f, -0.1f,  0.1f,
-	0.1f,  0.1f,  0.1f,
 
-	-0.1f, -0.1f, -0.1f,
-	0.1f, -0.1f, -0.1f,
-	0.1f, -0.1f,  0.1f,
+	-0.1f, -0.1f,  0.1f,
+	-0.1f,  0.1f,  0.1f,
+	0.1f,  0.1f,  0.1f,
+	0.1f,  0.1f,  0.1f,
 	0.1f, -0.1f,  0.1f,
 	-0.1f, -0.1f,  0.1f,
-	-0.1f, -0.1f, -0.1f,
 
 	-0.1f,  0.1f, -0.1f,
 	0.1f,  0.1f, -0.1f,
 	0.1f,  0.1f,  0.1f,
 	0.1f,  0.1f,  0.1f,
 	-0.1f,  0.1f,  0.1f,
-	-0.1f,  0.1f, -0.1f
+	-0.1f,  0.1f, -0.1f,
+
+	-0.1f, -0.1f, -0.1f,
+	-0.1f, -0.1f,  0.1f,
+	0.1f, -0.1f, -0.1f,
+	0.1f, -0.1f, -0.1f,
+	-0.1f, -0.1f,  0.1f,
+	0.1f, -0.1f,  0.1f
 };
 
 const int WIDTH = 1200;
@@ -230,9 +230,12 @@ void myGlutDisplay(void)
 			view = glm::lookAt(
 				//cos sin, z is same with vehicle
 				glm::vec3(vehiclePosX, vehiclePosY, vehiclePosZ),
-				glm::vec3(hor, ver, vehiclePosZ),
+				glm::vec3(0.3f+0.1f*glm::cos(glm::radians(vehicle_rotationAngle)), 0.1f*glm::sin(glm::radians(vehicle_rotationAngle)), vehiclePosZ),
 				glm::vec3(0, 1, 0)  // head is up (set to 0, -1, 0 to look upside down)
 			);
+			cout << "Angle: " << vehicle_rotationAngle;
+			cout << 0.5f*glm::cos(glm::radians(vehicle_rotationAngle));
+			cout << 0.5f*glm::sin(glm::radians(vehicle_rotationAngle));
 			break;
 	}
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)800 / (float)500, 0.1f, 100.0f);
@@ -383,12 +386,26 @@ void myGlutDisplay(void)
 	/*        Asteroids starts here         */
 	/****************************************/
 	glUseProgram(asteroidCommonShader);
+	glUniform3fv(glGetUniformLocation(asteroidCommonShader, "light.ambient"), 1, &lightAmbient[0]);
+	glUniform3fv(glGetUniformLocation(asteroidCommonShader, "light.diffuse"), 1, &lightDiffuse[0]);
+	glUniform3fv(glGetUniformLocation(asteroidCommonShader, "light.specular"), 1, &lightSpecular[0]);
+
 	glUniformMatrix4fv(glGetUniformLocation(asteroidCommonShader, "view"), 1, GL_FALSE, &view[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(asteroidCommonShader, "view0"), 1, GL_FALSE, &view0[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(asteroidCommonShader, "projection"), 1, GL_FALSE, &projection[0][0]);
+
+	glUniform1i(glGetUniformLocation(asteroidCommonShader, "material.diffuse"), 0);				//sampler
+	glUniform1i(glGetUniformLocation(asteroidCommonShader, "material.specular"), 1);				//sampler
+	materialShininess = 64.0f;															//but not this one
+	glUniform1f(glGetUniformLocation(asteroidCommonShader, "material.shininess"), materialShininess);
 	glUniform1i(glGetUniformLocation(asteroidCommonShader, "FogFlag"), FogFlag);
 	glUniform4fv(glGetUniformLocation(asteroidCommonShader, "FogRealColor"), 1, &FogRealColor[0]);
+
+	// bind diffuse map
 	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, asteroidCommonTexture);
+	// bind specular map
+	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, asteroidCommonTexture);
 	for (unsigned int x = 0; x < asteroidVAO.size(); x++) {
 		glBindVertexArray(asteroidVAO[x]);
@@ -966,7 +983,7 @@ int main(int argc, char* argv[])
 	modelMatrices = new glm::mat4[amount];
 	srand(glutGet(GLUT_ELAPSED_TIME)); // initialize random seed	
 	float radius = 3.0f;
-	float offset = 0.1f;
+	float offset = 0.2f;
 
 	vertices.clear();
 	uvs.clear();

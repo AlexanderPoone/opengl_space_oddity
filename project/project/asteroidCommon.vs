@@ -7,7 +7,9 @@ layout (location = 1) in vec2 uv;
 layout (location = 2) in vec3 normal;		//aNormal
 layout (location = 3) in mat4 aInstanceMatrix;
 
+out vec3 FragPos;
 out vec2 TexCoords;
+out vec3 Normal;
 out float visibility;
 
 uniform mat4 projection;
@@ -27,6 +29,10 @@ void main()
 	}
 
 //main
+	//new
+	FragPos = vec3(aInstanceMatrix * vec4(position, 1.0f));
     TexCoords = uv;
-    gl_Position = projection * view * aInstanceMatrix * vec4(position, 1.0f); 
+	//new
+	Normal = mat3(transpose(inverse(aInstanceMatrix))) * normal;  
+    gl_Position = projection * view * vec4(FragPos, 1.0); 
 }
