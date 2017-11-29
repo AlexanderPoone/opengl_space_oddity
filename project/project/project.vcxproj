@@ -126,6 +126,8 @@
     <None Include="lamp.vs" />
     <None Include="planetCommon.fs" />
     <None Include="planetCommon.vs" />
+    <None Include="planetEnviroment.fs" />
+    <None Include="planetEnvironment.vs" />
     <None Include="planetMulti.fs" />
     <None Include="skybox.fs" />
     <None Include="skybox.vs" />

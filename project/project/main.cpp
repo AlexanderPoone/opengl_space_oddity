@@ -135,7 +135,7 @@ GLuint lampVAO, lampVBO, lampShader;
 
 GLuint skyboxVAO, skyboxVBO, skyboxShader, skyboxTexture;
 
-GLuint planetCommonVAO, planetCommonVBO, planetCommonUV, planetCommonNormal, planetCommonShader, planetMultiShader;
+GLuint planetCommonVAO, planetCommonVBO, planetCommonUV, planetCommonNormal, planetCommonShader, planetMultiShader, planetEnviroShader;
 GLuint planet0_emissionMap, planet0_diffuseMap, planet0_specularMap;
 GLuint planet1_emissionMap_0, planet1_emissionMap_1, planet1_diffuseMap_0, planet1_diffuseMap_1, planet1_specularMap;
 GLuint planet2_emissionMap, planet2_diffuseMap, planet2_specularMap;
@@ -338,9 +338,30 @@ void myGlutDisplay(void)
 	/****************************************/
 	model = glm::translate(glm::mat4(), glm::vec3(0.15f, -0.05f, -0.5f))
 		* glm::scale(glm::mat4(), glm::vec3(0.01f, 0.01f, 0.01f))
+		* glm::rotate(glm::mat4(), -glm::radians(planet0_rotationAngle), glm::vec3(0, 1, 0))
 		* glm::mat4(1.0f);
+	// glUseProgram(planetEnviroShader);
 	// rebind model matrix
 	glUniformMatrix4fv(glGetUniformLocation(planetCommonShader, "model"), 1, GL_FALSE, &model[0][0]);
+	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "light.position"), 1, &lightPos[0]);
+	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "viewPos"), 1, &cameraPos[0]);
+
+	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "light.ambient"), 1, &lightAmbient[0]);
+	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "light.diffuse"), 1, &lightDiffuse[0]);
+	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "light.specular"), 1, &lightSpecular[0]);
+
+	//glUniformMatrix4fv(glGetUniformLocation(planetEnviroShader, "model"), 1, GL_FALSE, &model[0][0]);
+	//glUniformMatrix4fv(glGetUniformLocation(planetEnviroShader, "view"), 1, GL_FALSE, &view[0][0]);
+	//glUniformMatrix4fv(glGetUniformLocation(planetEnviroShader, "view0"), 1, GL_FALSE, &view0[0][0]);
+	//glUniformMatrix4fv(glGetUniformLocation(planetEnviroShader, "projection"), 1, GL_FALSE, &projection[0][0]);
+
+	//glUniform1i(glGetUniformLocation(planetEnviroShader, "material.emission"), 0);				//sampler
+	//glUniform1i(glGetUniformLocation(planetEnviroShader, "material.diffuse"), 1);				//sampler
+	//glUniform1i(glGetUniformLocation(planetEnviroShader, "material.specular"), 2);				//sampler
+
+	//glUniform1f(glGetUniformLocation(planetEnviroShader, "material.shininess"), materialShininess);
+	//glUniform1i(glGetUniformLocation(planetEnviroShader, "FogFlag"), FogFlag);
+	//glUniform4fv(glGetUniformLocation(planetEnviroShader, "FogRealColor"), 1, &FogRealColor[0]);
 	materialShininess = 10.0f;
 	glUniform1f(glGetUniformLocation(planetCommonShader, "material.shininess"), materialShininess);
 	// bind diffuse map
@@ -352,6 +373,11 @@ void myGlutDisplay(void)
 	// bind emission map
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, planet2_emissionMap);
+
+	//// bind skybox texture to calculate reflections
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+
 	// render the sphere
 	glBindVertexArray(planetCommonVAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 153600); //98304
@@ -361,6 +387,7 @@ void myGlutDisplay(void)
 	/****************************************/
 	model = glm::translate(glm::mat4(), glm::vec3(0.8f, 0.3f, -1.0f))
 		* glm::scale(glm::mat4(), glm::vec3(0.1f, 0.1f, 0.05f))
+		* glm::rotate(glm::mat4(), glm::radians(planet0_rotationAngle), glm::vec3(0, 1, 0))
 		* glm::mat4(1.0f);
 	glUseProgram(planetMultiShader);
 	materialShininess = 100.0f;
@@ -978,7 +1005,7 @@ int main(int argc, char* argv[])
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
-	loadOBJ("io2.obj", vertices, uvs, normals);
+	loadOBJ("bumpy.obj", vertices, uvs, normals);	//"io2.obj"
 	glGenVertexArrays(1, &planetCommonVAO);
 
 	// Planet Vertices
@@ -1020,6 +1047,7 @@ int main(int argc, char* argv[])
 
 	planetCommonShader = installShaders("planetCommon.vs", "planetCommon.fs");
 	planetMultiShader = installShaders("planetCommon.vs", "planetMulti.fs");
+	//	planetEnviroShader = installShaders("planetEnvironment.vs", "planetEnvironment.fs");
 
 	// Asteroids
 	glm::mat4* modelMatrices;

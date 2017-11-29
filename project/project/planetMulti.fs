@@ -33,16 +33,16 @@ uniform vec4 FogRealColor;
 void main()
 {
     // emission
-    vec3 emission = (0.5*texture(material.emission_0, TexCoords)+0.5*texture(material.emission_1, TexCoords)).rgb;
+    vec3 emission = (0.7*texture(material.emission_0, TexCoords)+0.3*texture(material.emission_1, TexCoords)).rgb;
 
     // ambient
-    vec3 ambient = light.ambient * (0.5*texture(material.diffuse_0, TexCoords)+0.5*texture(material.diffuse_1, TexCoords)).rgb;
+    vec3 ambient = light.ambient * (0.7*texture(material.diffuse_0, TexCoords)+0.3*texture(material.diffuse_1, TexCoords)).rgb;
   	
     // diffuse 
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(light.position - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = light.diffuse * diff * (0.5*texture(material.diffuse_0, TexCoords)+0.5*texture(material.diffuse_1, TexCoords)).rgb;  
+    vec3 diffuse = light.diffuse * diff * (0.7*texture(material.diffuse_0, TexCoords)+0.3*texture(material.diffuse_1, TexCoords)).rgb;  
     
     // specular
     vec3 viewDir = normalize(viewPos - FragPos);
