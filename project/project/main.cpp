@@ -162,7 +162,7 @@ int FogFlag=0;
 std::deque<glm::mat4> vehicleHistory;
 
 GLfloat lightPos_translate=0.0f, lightPos_step=0.005f;
-GLfloat planet0_rotationAngle = 0.0f, vehicle_rotationAngle = 0.0f, vehicle_s=0.5f;
+GLfloat planet0_rotationAngle = 0.0f, vehicle_rotationAngle = 0.0f, vehicle_s=0.5f, scroll=0.0f;
 
 int viewpointId=0, fogColorId;
 GLUI_RadioGroup *group1;
@@ -215,7 +215,7 @@ void myGlutDisplay(void)
 	switch (viewpointId) {
 		case 0:
 			view = glm::lookAt(
-				glm::vec3(0, 0, 0),
+				glm::vec3(0.0f, 0.0f, 0.0f+scroll),
 				glm::vec3(hor, ver, -1),
 				glm::vec3(0, 1, 0)  // head is up (set to 0, -1, 0 to look upside down)
 			);
@@ -679,6 +679,17 @@ void myGlutKeyboard(unsigned char key, int x, int y) {
 void myGlutMouse(int x, int y) {
 	hor = (512.0 - x) / 128.0;
 	ver = (y - 288.0) / 128.0;
+}
+
+void myGlutScroll(int button, int state, int x, int y) {
+	if (button == 3 && scroll > -0.9f) {
+		cout << "Scroll up";
+		scroll -= 0.05f;
+	}
+	else if (button == 4 && scroll < 1.0f) {
+		cout << "Scroll down";
+		scroll += 0.05f;
+	}
 }
 
 void glui_callback(int control_id) {
@@ -1315,6 +1326,7 @@ int main(int argc, char* argv[])
 
 	/* We register the idle callback with GLUI, *not* with GLUT */
 	GLUI_Master.set_glutKeyboardFunc(myGlutKeyboard);
+	GLUI_Master.set_glutMouseFunc(myGlutScroll);
 	glutPassiveMotionFunc(myGlutMouse);
 
 	GLUI_Master.set_glutIdleFunc(myGlutIdle);
