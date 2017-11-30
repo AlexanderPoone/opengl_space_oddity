@@ -340,28 +340,8 @@ void myGlutDisplay(void)
 		* glm::scale(glm::mat4(), glm::vec3(0.01f, 0.01f, 0.01f))
 		* glm::rotate(glm::mat4(), -glm::radians(planet0_rotationAngle), glm::vec3(0, 1, 0))
 		* glm::mat4(1.0f);
-	// glUseProgram(planetEnviroShader);
 	// rebind model matrix
 	glUniformMatrix4fv(glGetUniformLocation(planetCommonShader, "model"), 1, GL_FALSE, &model[0][0]);
-	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "light.position"), 1, &lightPos[0]);
-	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "viewPos"), 1, &cameraPos[0]);
-
-	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "light.ambient"), 1, &lightAmbient[0]);
-	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "light.diffuse"), 1, &lightDiffuse[0]);
-	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "light.specular"), 1, &lightSpecular[0]);
-
-	//glUniformMatrix4fv(glGetUniformLocation(planetEnviroShader, "model"), 1, GL_FALSE, &model[0][0]);
-	//glUniformMatrix4fv(glGetUniformLocation(planetEnviroShader, "view"), 1, GL_FALSE, &view[0][0]);
-	//glUniformMatrix4fv(glGetUniformLocation(planetEnviroShader, "view0"), 1, GL_FALSE, &view0[0][0]);
-	//glUniformMatrix4fv(glGetUniformLocation(planetEnviroShader, "projection"), 1, GL_FALSE, &projection[0][0]);
-
-	//glUniform1i(glGetUniformLocation(planetEnviroShader, "material.emission"), 0);				//sampler
-	//glUniform1i(glGetUniformLocation(planetEnviroShader, "material.diffuse"), 1);				//sampler
-	//glUniform1i(glGetUniformLocation(planetEnviroShader, "material.specular"), 2);				//sampler
-
-	//glUniform1f(glGetUniformLocation(planetEnviroShader, "material.shininess"), materialShininess);
-	//glUniform1i(glGetUniformLocation(planetEnviroShader, "FogFlag"), FogFlag);
-	//glUniform4fv(glGetUniformLocation(planetEnviroShader, "FogRealColor"), 1, &FogRealColor[0]);
 	materialShininess = 10.0f;
 	glUniform1f(glGetUniformLocation(planetCommonShader, "material.shininess"), materialShininess);
 	// bind diffuse map
@@ -374,10 +354,6 @@ void myGlutDisplay(void)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, planet2_emissionMap);
 
-	//// bind skybox texture to calculate reflections
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
-
 	// render the sphere
 	glBindVertexArray(planetCommonVAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 153600); //98304
@@ -385,10 +361,12 @@ void myGlutDisplay(void)
 	/****************************************/
 	/*          Planet 2 ends here          */
 	/****************************************/
-	model = glm::translate(glm::mat4(), glm::vec3(0.8f, 0.3f, -1.0f))
-		* glm::scale(glm::mat4(), glm::vec3(0.1f, 0.1f, 0.05f))
+	model = glm::translate(glm::mat4(), glm::vec3(0.3f, 0.0f, -0.9f))			//move (0,0) TO centre of planet A
 		* glm::rotate(glm::mat4(), glm::radians(planet0_rotationAngle), glm::vec3(0, 1, 0))
-		* glm::mat4(1.0f);
+		* glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.2f))				//radius
+		* glm::scale(glm::mat4(), glm::vec3(0.06f, 0.06f, 0.06f))
+		* glm::rotate(glm::mat4(), -glm::radians(planet0_rotationAngle*5.0f), glm::vec3(0, 1, 0))	//self-rotation
+		* glm::mat4(1.0f);	//TODO: rotate around planet A: 0.3f, 0.0f, -0.9f
 	glUseProgram(planetMultiShader);
 	materialShininess = 100.0f;
 	glUniform3fv(glGetUniformLocation(planetMultiShader, "light.position"), 1, &lightPos[0]);
@@ -436,6 +414,41 @@ void myGlutDisplay(void)
 
 	/****************************************/
 	/*          Planet 1 ends here          */
+	/****************************************/
+	model = glm::translate(glm::mat4(), glm::vec3(0.8f, 0.3f, -1.0f))
+		* glm::scale(glm::mat4(), glm::vec3(0.1f, 0.1f, 0.05f))
+		* glm::rotate(glm::mat4(), glm::radians(planet0_rotationAngle), glm::vec3(0, 1, 0))
+		* glm::mat4(1.0f);
+	glUseProgram(planetEnviroShader);
+	// rebind model matrix
+	glUniform3fv(glGetUniformLocation(planetEnviroShader, "viewPos"), 1, &cameraPos[0]);
+
+	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "light.position"), 1, &lightPos[0]);
+	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "light.ambient"), 1, &lightAmbient[0]);
+	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "light.diffuse"), 1, &lightDiffuse[0]);
+	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "light.specular"), 1, &lightSpecular[0]);
+
+	glUniformMatrix4fv(glGetUniformLocation(planetEnviroShader, "model"), 1, GL_FALSE, &model[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(planetEnviroShader, "view"), 1, GL_FALSE, &view[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(planetEnviroShader, "view0"), 1, GL_FALSE, &view0[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(planetEnviroShader, "projection"), 1, GL_FALSE, &projection[0][0]);
+
+	glUniform1i(glGetUniformLocation(planetEnviroShader, "skybox"), 0);				//sampler
+
+	glUniform1i(glGetUniformLocation(planetEnviroShader, "FogFlag"), FogFlag);
+	glUniform4fv(glGetUniformLocation(planetEnviroShader, "FogRealColor"), 1, &FogRealColor[0]);
+
+	// bind skybox texture to calculate reflections
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+
+	// render the sphere
+	glBindVertexArray(planetCommonVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 153600); //98304
+	glBindVertexArray(0);
+
+	/****************************************/
+	/*          Planet 3 ends here          */
 	/****************************************/
 
 	/****************************************/
@@ -663,10 +676,9 @@ void myGlutKeyboard(unsigned char key, int x, int y) {
 	}
 }
 
-void myGlutMouse(int button, int state, int x, int y) {
-	////TODO: 
-	//moveX = (256.0 - x) / 128.0;
-	//moveY = (y - 256.0) / 128.0;
+void myGlutMouse(int x, int y) {
+	hor = (512.0 - x) / 128.0;
+	ver = (y - 288.0) / 128.0;
 }
 
 void glui_callback(int control_id) {
@@ -1001,7 +1013,7 @@ int main(int argc, char* argv[])
 
 	lampShader = installShaders("lamp.vs", "lamp.fs");
 
-	// 3 planets
+	// 4 planets
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
@@ -1047,7 +1059,7 @@ int main(int argc, char* argv[])
 
 	planetCommonShader = installShaders("planetCommon.vs", "planetCommon.fs");
 	planetMultiShader = installShaders("planetCommon.vs", "planetMulti.fs");
-	//	planetEnviroShader = installShaders("planetEnvironment.vs", "planetEnvironment.fs");
+	planetEnviroShader = installShaders("planetEnvironment.vs", "planetEnvironment.fs");
 
 	// Asteroids
 	glm::mat4* modelMatrices;
@@ -1303,7 +1315,7 @@ int main(int argc, char* argv[])
 
 	/* We register the idle callback with GLUI, *not* with GLUT */
 	GLUI_Master.set_glutKeyboardFunc(myGlutKeyboard);
-	GLUI_Master.set_glutMouseFunc(myGlutMouse);
+	glutPassiveMotionFunc(myGlutMouse);
 
 	GLUI_Master.set_glutIdleFunc(myGlutIdle);
 	GLUI_Master.set_glutReshapeFunc(myGlutReshape);

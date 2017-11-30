@@ -12,9 +12,9 @@ out vec3 Normal;						//normalWorld
 out float visibility;
 
 uniform mat4 model;
-uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 view0;
+uniform mat4 projection;
 uniform int FogFlag;
 
 void main()

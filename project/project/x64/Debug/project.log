@@ -1,10 +1,12 @@
 ﻿  main.cpp
 c:\users\alex poon\desktop\inav - copy\project\includes\gl\glui.h(880): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
 c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(192): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(781): warning C4101: 'height': unreferenced local variable
-c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(781): warning C4101: 'width': unreferenced local variable
-c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(974): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
-c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(1093): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(1097): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(680): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(681): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(793): warning C4101: 'height': unreferenced local variable
+c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(793): warning C4101: 'width': unreferenced local variable
+c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(986): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(1105): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\alex poon\desktop\inav - copy\project\project\main.cpp(1109): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
   project.vcxproj -> C:\Users\Alex Poon\Desktop\inav - Copy\project\x64\Debug\project.exe
   project.vcxproj -> C:\Users\Alex Poon\Desktop\inav - Copy\project\x64\Debug\project.pdb (Partial PDB)
