@@ -12,6 +12,7 @@ out vec2 TexCoords;
 out vec3 Normal;
 out float visibility;
 
+uniform mat4 transform;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 view0;
@@ -30,7 +31,8 @@ void main()
 
 //main
 	//new
-	FragPos = vec3(aInstanceMatrix * vec4(position, 1.0f));
+	FragPos = vec3(transform * aInstanceMatrix * vec4(position, 1.0f));
+	//FragPos = vec3(aInstanceMatrix * vec4(position, 1.0f));
     TexCoords = uv;
 	//new
 	Normal = mat3(transpose(inverse(aInstanceMatrix))) * normal;  

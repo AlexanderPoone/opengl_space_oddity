@@ -455,6 +455,15 @@ void myGlutDisplay(void)
 	/*        Asteroids starts here         */
 	/****************************************/
 	glUseProgram(asteroidCommonShader);
+
+	//
+	model = glm::translate(glm::mat4(), glm::vec3(0.8f, 0.3f, -1.0f))
+		* glm::rotate(glm::mat4(), glm::radians(planet0_rotationAngle/4.0f), glm::vec3(0, 1, 0))
+		* glm::translate(glm::mat4(), glm::vec3(-0.8f, -0.3f, 1.0f))
+		* glm::mat4(1.0f);
+	glUniformMatrix4fv(glGetUniformLocation(asteroidCommonShader, "transform"), 1, GL_FALSE, &model[0][0]);
+	//
+
 	glUniform3fv(glGetUniformLocation(asteroidCommonShader, "light.ambient"), 1, &lightAmbient[0]);
 	glUniform3fv(glGetUniformLocation(asteroidCommonShader, "light.diffuse"), 1, &lightDiffuse[0]);
 	glUniform3fv(glGetUniformLocation(asteroidCommonShader, "light.specular"), 1, &lightSpecular[0]);
