@@ -28,5 +28,6 @@ Manipulation:
 	Key 'e' or 'E':			Decrease diffuse lighting
 
 	Key 'Esc':				Quit the program
-	Mouse cursor:			Move view
+	Mouse cursor:			Move scene
+	Ket ' ':				Toggle mouse control
 	Mouse wheel scroll:		Zoom in/out

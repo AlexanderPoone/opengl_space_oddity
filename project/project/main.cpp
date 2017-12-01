@@ -157,7 +157,7 @@ glm::mat4 view=glm::lookAt(
 );
 GLfloat vehiclePosX=0.0f, vehiclePosY=0.0f, vehiclePosZ=0.0f;
 
-int FogFlag=0;
+int FogFlag=0, viewTransformationEnabled=1;
 
 std::deque<glm::mat4> vehicleHistory;
 
@@ -167,6 +167,8 @@ GLfloat planet0_rotationAngle = 0.0f, vehicle_rotationAngle = 0.0f, vehicle_s=0.
 int viewpointId=0, fogColorId;
 GLUI_RadioGroup *group1;
 float hor = 0.0f, ver = 0.0f;
+float translate_xy[2] = { 0, 0 };		//  Translation XY Live Variable
+float translate_z = 0;		//  Translation Z Live Variable
 
 /***************************************** myGlutIdle() ***********/
 
@@ -679,6 +681,9 @@ void myGlutKeyboard(unsigned char key, int x, int y) {
 	{
 		diffuse -= 0.1f;
 	}
+	if (key == ' ') {
+		viewTransformationEnabled ^= 1;
+	}
 	if (key == '\033')
 	{
 		exit(0);
@@ -686,8 +691,10 @@ void myGlutKeyboard(unsigned char key, int x, int y) {
 }
 
 void myGlutMouse(int x, int y) {
-	hor = (512.0 - x) / 128.0;
-	ver = (y - 288.0) / 128.0;
+	if (viewTransformationEnabled) {
+		hor = (512.0 - x) / 128.0;
+		ver = (y - 288.0) / 128.0;
+	}
 }
 
 void myGlutScroll(int button, int state, int x, int y) {
@@ -704,6 +711,13 @@ void myGlutScroll(int button, int state, int x, int y) {
 void glui_callback(int control_id) {
 	switch (control_id) 
 	{
+		case 11:	// translate XY
+			hor += translate_xy[0] * 0.00001f;
+			ver += translate_xy[1] * 0.00001f;
+			break;
+		case 12:	// translate XY
+			scroll += translate_z * 0.00001f;
+			break;
 		case 17:	// fog colour
 			if (fogColorId == 0) {
 				FogRealColor = glm::vec4(.8f, .8f, .8f, 1.0f);
@@ -1327,9 +1341,9 @@ int main(int argc, char* argv[])
 
 	GLUI_Rotation *arcball = glui->add_rotation("Rotation");
 
-	GLUI_Translation *translation_xy = glui->add_translation("Translation XY", GLUI_TRANSLATION_XY);
+	GLUI_Translation *translation_xy = glui->add_translation("Translation XY", GLUI_TRANSLATION_XY, translate_xy, 11, glui_callback);
 
-	GLUI_Translation *translation_x = glui->add_translation("Translation X", GLUI_TRANSLATION_X);
+	GLUI_Translation *translation_x = glui->add_translation("Translation Z", GLUI_TRANSLATION_Z, &translate_z, 12, glui_callback);
 
 	glui->add_button("Quit", 0, (GLUI_Update_CB)exit);
 
