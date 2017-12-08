@@ -7,7 +7,7 @@ Features:
 	✓ 3 Viewpoints
 	✓ Skybox and light source cube
 	✓ Fog with 2-colour options
-	✓ Bump mapping
+	✓ Displacement mapping
 	✓ Phong shading (ADS lighting)
 	✓ Self-rotation and rotation around another planet at the same time
 	✓ Multiple shading

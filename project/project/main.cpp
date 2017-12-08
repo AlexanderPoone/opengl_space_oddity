@@ -129,6 +129,8 @@ const int HEIGHT = 800;
 const float ASPECT = float(WIDTH) / HEIGHT;   // desired aspect ratio
 
 glm::vec3 lightPos(-0.05f, -0.05f, -0.5f);
+glm::vec3 lightPos2(-0.55f, 0.25f, -0.5f);
+
 glm::vec3 cameraPos(0.0f, 0.0f, 0.0f);
 
 GLuint lampVAO, lampVBO, lampShader;
@@ -288,6 +290,16 @@ void myGlutDisplay(void)
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 
+	// second light source
+	// rebind model matrix
+	model = glm::scale(glm::mat4(), glm::vec3(0.1f))
+		* glm::translate(glm::mat4(), lightPos2)
+		* glm::mat4(1.0f);
+	glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, &model[0][0]);
+	glBindVertexArray(lampVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+
 	/****************************************/
 	/*         Planet 0 starts here         */
 	/****************************************/
@@ -299,6 +311,7 @@ void myGlutDisplay(void)
 	glUseProgram(planetCommonShader);
 
 	glUniform3fv(glGetUniformLocation(planetCommonShader, "light.position"), 1, &lightPos[0]);
+	glUniform3fv(glGetUniformLocation(planetCommonShader, "light.position2"), 1, &lightPos2[0]);
 	glUniform3fv(glGetUniformLocation(planetCommonShader, "viewPos"), 1, &cameraPos[0]);
 	//std::cout << glGetError() << std::endl; // returns 0 (no error)
 
@@ -372,6 +385,7 @@ void myGlutDisplay(void)
 	glUseProgram(planetMultiShader);
 	materialShininess = 100.0f;
 	glUniform3fv(glGetUniformLocation(planetMultiShader, "light.position"), 1, &lightPos[0]);
+	glUniform3fv(glGetUniformLocation(planetMultiShader, "light.position2"), 1, &lightPos2[0]);
 	glUniform3fv(glGetUniformLocation(planetMultiShader, "viewPos"), 1, &cameraPos[0]);
 
 	glUniform3fv(glGetUniformLocation(planetMultiShader, "light.ambient"), 1, &lightAmbient[0]);
@@ -426,6 +440,7 @@ void myGlutDisplay(void)
 	glUniform3fv(glGetUniformLocation(planetEnviroShader, "viewPos"), 1, &cameraPos[0]);
 
 	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "light.position"), 1, &lightPos[0]);
+	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "light.position2"), 1, &lightPos2[0]);
 	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "light.ambient"), 1, &lightAmbient[0]);
 	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "light.diffuse"), 1, &lightDiffuse[0]);
 	//glUniform3fv(glGetUniformLocation(planetEnviroShader, "light.specular"), 1, &lightSpecular[0]);
@@ -465,6 +480,9 @@ void myGlutDisplay(void)
 		* glm::mat4(1.0f);
 	glUniformMatrix4fv(glGetUniformLocation(asteroidCommonShader, "transform"), 1, GL_FALSE, &model[0][0]);
 	//
+
+	glUniform3fv(glGetUniformLocation(asteroidCommonShader, "light.position"), 1, &lightPos[0]);
+	glUniform3fv(glGetUniformLocation(asteroidCommonShader, "light.position2"), 1, &lightPos2[0]);
 
 	glUniform3fv(glGetUniformLocation(asteroidCommonShader, "light.ambient"), 1, &lightAmbient[0]);
 	glUniform3fv(glGetUniformLocation(asteroidCommonShader, "light.diffuse"), 1, &lightDiffuse[0]);
@@ -516,6 +534,7 @@ void myGlutDisplay(void)
 	vehicleHistory.push_back(model);
 
 	glUniform3fv(glGetUniformLocation(vehicleShader, "light.position"), 1, &lightPos[0]);
+	glUniform3fv(glGetUniformLocation(vehicleShader, "light.position2"), 1, &lightPos2[0]);
 	glUniform3fv(glGetUniformLocation(vehicleShader, "viewPos"), 1, &cameraPos[0]);
 	std::cout << glGetError() << std::endl; // returns 0 (no error)
 
@@ -564,6 +583,7 @@ void myGlutDisplay(void)
 		glUseProgram(starCommonShader);
 
 		glUniform3fv(glGetUniformLocation(starCommonShader, "light.position"), 1, &lightPos[0]);
+		glUniform3fv(glGetUniformLocation(starCommonShader, "light.position2"), 1, &lightPos2[0]);
 		glUniform3fv(glGetUniformLocation(starCommonShader, "viewPos"), 1, &cameraPos[0]);
 
 		glUniform3fv(glGetUniformLocation(starCommonShader, "light.ambient"), 1, &lightAmbient[0]);
