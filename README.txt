@@ -1,13 +1,15 @@
 CSCI3260 Project
 
-1155038226 Li Dek Hei Desmond
+1155038226 Free rider
 1155063232 Poon Bing Chun
 
 Features:
 	✓ 3 Viewpoints
 	✓ Skybox and light source cube
+	✓ 2 light sources
 	✓ Fog with 2-colour options
-	✓ Displacement mapping
+	✓ Normal mapping
+	✓ Displacement mapping (craters)
 	✓ Phong shading (ADS lighting)
 	✓ Self-rotation and rotation around another planet at the same time
 	✓ Multiple shading
@@ -29,5 +31,5 @@ Manipulation:
 
 	Key 'Esc':				Quit the program
 	Mouse cursor:			Move scene
-	Ket ' ':				Toggle mouse control
+	Key ' ':				Toggle mouse control
 	Mouse wheel scroll:		Zoom in/out

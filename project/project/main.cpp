@@ -129,7 +129,7 @@ const int HEIGHT = 800;
 const float ASPECT = float(WIDTH) / HEIGHT;   // desired aspect ratio
 
 glm::vec3 lightPos(-0.05f, -0.05f, -0.5f);
-glm::vec3 lightPos2(-0.55f, 0.25f, -0.5f);
+glm::vec3 lightPos2(-0.55f, 0.25f, -0.7f);
 
 glm::vec3 cameraPos(0.0f, 0.0f, 0.0f);
 
@@ -144,7 +144,7 @@ GLuint planet2_emissionMap, planet2_diffuseMap, planet2_specularMap;
 
 GLuint vehicleVAO, vehicleVBO, vehicleUV, vehicleNormal, vehicleShader, vehicle_diffuseMap, vehicle_specularMap, vehicle_emissionMap;
 
-GLuint amount = 100, asteroidCommonVBO, asteroidCommonUV, asteroidCommonNormal, asteroidCommonInstanced, asteroidCommonDrawSize, asteroidCommonTexture, asteroidCommonShader;
+GLuint amount = 20000, asteroidCommonVBO, asteroidCommonUV, asteroidCommonNormal, asteroidCommonInstanced, asteroidCommonDrawSize, asteroidCommonTexture, asteroidCommonShader;
 std::vector<GLuint> asteroidVAO;
 
 GLuint starCommonVAO, starVBO, starCommonUV, starCommonNormal, star_diffuseMap, star_specularMap, star_emissionMap, starCommonShader;
@@ -171,6 +171,9 @@ GLUI_RadioGroup *group1;
 float hor = 0.0f, ver = 0.0f;
 float translate_xy[2] = { 0, 0 };		//  Translation XY Live Variable
 float translate_z = 0;		//  Translation Z Live Variable
+
+int case2_y;
+float old;
 
 /***************************************** myGlutIdle() ***********/
 
@@ -233,14 +236,28 @@ void myGlutDisplay(void)
 			break;
 		case 2:
 			view = glm::lookAt(
-				//cos sin, z is same with vehicle
-				glm::vec3(vehiclePosX, vehiclePosY, vehiclePosZ),
-				glm::vec3(0.3f+0.1f*glm::cos(glm::radians(vehicle_rotationAngle)), 0.1f*glm::sin(glm::radians(vehicle_rotationAngle)), vehiclePosZ),
+				glm::vec3(-0.5f, 0.0f, -0.8),
+				glm::vec3(0.5f + hor, 0.0f + ver, -0.8f),
 				glm::vec3(0, 1, 0)  // head is up (set to 0, -1, 0 to look upside down)
 			);
-			cout << "Angle: " << vehicle_rotationAngle;
-			cout << 0.5f*glm::cos(glm::radians(vehicle_rotationAngle));
-			cout << 0.5f*glm::sin(glm::radians(vehicle_rotationAngle));
+			break;
+		case 3:
+			if ((old - vehiclePosX > 0.0f) && (glm::abs(vehiclePosX - 0.4755f) < 0.0004)) {
+				case2_y = -1;
+				cout << "Hi 1\n\n\n\n\n";
+			}
+			if ((old - vehiclePosX < 0.0f) && (glm::abs(vehiclePosX - 0.125f) < 0.0004)) {
+				case2_y = 1;
+				cout << "Hi 2\n\n\n\n\n\n";
+			}
+			view = glm::lookAt(
+				//cos sin, z is same with vehicle
+				glm::vec3(vehiclePosX, vehiclePosY, vehiclePosZ),
+				glm::vec3(vehicleHistory[0][3][0], vehicleHistory[0][3][1], vehicleHistory[0][3][2]),
+				glm::vec3(0, case2_y, 0)  // head is up (set to 0, -1, 0 to look upside down)
+			);
+			cout << vehiclePosX;
+			old = vehiclePosX;
 			break;
 	}
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)800 / (float)500, 0.1f, 100.0f);
@@ -1143,7 +1160,7 @@ int main(int argc, char* argv[])
 	for (unsigned int i = 0; i < amount; i++) {
 		glm::mat4 model=
 			glm::translate(glm::mat4(), glm::vec3(0.8f, 0.3f, -1.0f))
-			* glm::scale(glm::mat4(), glm::vec3(0.05f))
+			* glm::scale(glm::mat4(), glm::vec3(0.04f))
 			* glm::mat4(); //			glm::translate(glm::mat4(), glm::vec3(0.3f, 0.0f, -0.9f))
 		// 1. translation: displace along circle with 'radius' in range [-offset, offset]
 		float angle = (float)i / (float)amount * 360.0f;
@@ -1347,7 +1364,8 @@ int main(int argc, char* argv[])
 	group1 = glui->add_radiogroup_to_panel(obj_panel, &viewpointId);
 	glui->add_radiobutton_to_group(group1, "Left");
 	glui->add_radiobutton_to_group(group1, "Top");
-	glui->add_radiobutton_to_group(group1, "Vehicle");
+	glui->add_radiobutton_to_group(group1, "Side");
+	glui->add_radiobutton_to_group(group1, "Vehicle Tail");
 
 	GLUI_Panel *fog_panel = glui->add_panel_to_panel(render_rollout, "Fog On/Off");
 	GLUI_Checkbox *fog_checkbox = glui->add_checkbox_to_panel(fog_panel, "Fog", &FogFlag);

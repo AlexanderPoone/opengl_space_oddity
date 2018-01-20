@@ -1,6 +1,6 @@
 #version 430
-const float FogDensity = 0.75;
-const float FogGradient = 3.5;
+const float FogDensity = 1.25;
+const float FogGradient = 0.75;
 layout (location = 0) in vec3 aPos;
 
 out float visibility;
