@@ -1,6 +1,5 @@
-CSCI3260 Project
+OpenGL Project
 
-1155038226 Free rider
 1155063232 Poon Bing Chun
 
 Features:
